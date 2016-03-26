@@ -3,45 +3,42 @@
  * --------------------------
  * FUNCTIONS OCRAWL WORDS AND LINKS ON A PAGE
  */
+const http = require('follow-redirects').http;
+const https = require('follow-redirects').https;
+const cheerio = require('cheerio');
+const StringDecoder = require('string_decoder').StringDecoder;
 
 module.exports = (() => {
 
-	const X = require('x-ray')();
-	X.timeout(10*1000);
-
 	// EXTRACT WORDS + FREQUENCIES FROM A PAGE
-	var extractWords = (link) => {
-		return new Promise((resolve, reject) => {
-			X(link, {
-				allWords: 'body'
-			})((err, bodyObj) => {
-				if (err) reject(null)
-				else resolve(bodyObj.allWords.replace(/[\n|\t|,|.|\(|\)|\:|\/|\\|\-|\[|\]]/g, ' ').split(' '));
-			})
-		});
+	var extractWords = (body) => {
+		return body.replace(/[\n|\t|,|.|\(|\)|\:|\/|\\|\-|\[|\]]/g, ' ').split(' ');
 	}
 
 	// EXTRACT ALL LINKS ON A PAGE
 	var extractLinks = (link) => {
 		return new Promise((resolve, reject) => {
-			X(link, {
-				title: 'title',
-				childLinks: ['a@href']
-			})((err, pageInfo) => {
-				if (err) reject(err)
-				else {
-					// extract unqiue url, ignoring http, https
-					var linkSet = [];
-					pageInfo.childLinks.forEach((link) => {
-						var siginificantURL = link.match(/.+:\/\/(.+)/)[1];
-						if (!~linkSet.indexOf(siginificantURL))
-							linkSet.push(siginificantURL)
+
+			var decoder = new StringDecoder('utf8');
+			(~link.indexOf('http://')?http:https).get(link, (res) => {
+				res.on('data', (chunk) => {
+					var $ = cheerio.load(decoder.write(chunk));
+					var linkSet = new Set();
+					$('a[href]').each((a_i, a) => {
+						linkSet.add(($(a).attr('href').match(/http[s]?:\/\//)?"":link)+$(a).attr('href'));
 					});
-					pageInfo.childLinks = linkSet;
-					resolve(pageInfo);
-				}
+					resolve({
+						lastModifiedDate: new Date(res.headers["last-modified"]) || null,
+						pageSize: res.headers["content-length"] || null, // in bytes
+						title: $('title').text() || "",
+						childLinks: Array.from(linkSet)
+					});
+				});
+			}).on('error', (err) => {
+				reject(err);
 			});
-		});
+
+		}); // end:: promise
 	}
 
 	return {

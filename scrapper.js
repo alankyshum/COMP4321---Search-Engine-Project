@@ -18,13 +18,17 @@ var index = {
  * MAIN FUNCTION
  */
 
-crawl.extractLinks("https://www.cse.ust.hk").then((pageInfo) => {
+crawl.extractLinks("https://www.cse.ust.hk").then((page) => {
+
+	console.log(page.lastModifiedDate);
+	console.log(page.pageSize);
+	console.log(page.title);
 
 	// GET PARENT-CHILD LINKING RELATIONSHIP OF ALL PAGES
-	pageInfo.childLinks.forEach((link) => {
-		crawl.extractLinks(`https://${link}`).then((childPageInfo) => {
-			console.log(`${childPageInfo.title}:\n${link}`.underline.red);
-			childPageInfo.childLinks.forEach((childLink) => {
+	page.childLinks.forEach((link) => {
+		crawl.extractLinks(link).then((childPage) => {
+			console.log(`${childPage.title}:\n${link}`.underline.red);
+			childPage.childLinks.forEach((childLink) => {
 				console.log(`\t${childLink}`);
 			})
 		})

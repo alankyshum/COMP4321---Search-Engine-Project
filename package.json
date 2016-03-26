@@ -24,8 +24,9 @@
   },
   "homepage": "https://gitlab.com/alankyshum/COMP4321_2016#README",
   "dependencies": {
+    "cheerio": "^0.20.0",
     "firebase": "^2.4.1",
-    "x-ray": "^2.0.3"
+    "follow-redirects": "0.0.7"
   },
   "devDependencies": {
     "colors": "^1.1.2"
