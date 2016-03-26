@@ -8,7 +8,7 @@ const colors = require('colors');
 
 
 // CONSTANTS
-const rootLink = "https://www.cse.ust.hk/";
+const rootLink = "https://www.cse.ust.hk/";  // TODO: Insert to DB by hardcoded, Link-ID <=> link Data
 const maxCrawlPages = 300;
 const dancePeriod = 180*1000;  // 180 seconds
 
@@ -38,12 +38,21 @@ var crawl = (link) => {
         //console.log(page.lastModifiedDate);
         //console.log(page.pageSize);
         //console.log(page.title);
+        
         checked[link] = true;
         crawledPages++;
-        page.childLinks.forEach((link) => { queue.push(link); });
+        page.childLinks.forEach((childLink) => {
+            
+            // TODO: Check childLink exists in DB, Link ID <=> Link Data
+            // TODO: If yes, check last modified date => if changes => Update Link Data
+            // TODO: If no, Insert to DB, Link-ID <=> Link Data
+            // TODO: For both cases, check relationship exists, if not add Parent <=> Child Links
+            // TODO: For both cases, check missing childs for this parent, if found delete Parent <=> old child Links (lazy deletion for Link Id <=> Link data for the not existed child too.
+            
+            queue.push(childLink);
+        });
         while(queue.length && checked[queue[0]])
             queue.shift();
-        
         if(queue.length && crawledPages < maxCrawlPages)
             crawl(queue[0]);  // recursive crawling
 

@@ -25,7 +25,7 @@ module.exports = (() => {
 					var linkSet = new Set();
 					$('a[href]').each((a_i, a) => {
                         var path = $(a).attr('href').split('?')[0];
-                        if(path[0]=='/') path = path.slice(1);
+                        if(path[0]=='/') path = path.slice(1);  // avoid treating "http://cse.ust.hk/ and http://cse.ust.hk// as two sites"
 						linkSet.add(($(a).attr('href').match(/^http[s]?:\/\//)?"":link)+path);
 					});
 					resolve({
