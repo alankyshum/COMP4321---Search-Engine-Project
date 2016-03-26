@@ -1,10 +1,16 @@
 // VENDOR LIBRARY
 const stemmer = require('./vendor/porterStemmer');
 // DIVIDED MODULES
-const crawl = require('./mod/crawler');
+const crawler = require('./mod/crawler');
 const stopword = require('./mod/stopword');
 // OPTIONAL LIBRARY
 const colors = require('colors');
+
+
+// CONSTANTS
+const rootLink = "https://www.cse.ust.hk/";
+const maxCrawlPages = 300;
+const dancePeriod = 180*1000;  // 180 seconds
 
 
 // CREATE INDEX FROM DOCUMENTS
@@ -18,23 +24,42 @@ var index = {
  * MAIN FUNCTION
  */
 
-crawl.extractLinks("https://www.cse.ust.hk").then((page) => {
 
-	console.log(page.lastModifiedDate);
-	console.log(page.pageSize);
-	console.log(page.title);
+// BFS + ELIMINATE CYCLES
+var queue = [rootLink];
+var checked = {};
+var crawledPages = 0;
 
-	// GET PARENT-CHILD LINKING RELATIONSHIP OF ALL PAGES
-	page.childLinks.forEach((link) => {
-		crawl.extractLinks(link).then((childPage) => {
-			console.log(`${childPage.title}:\n${link}`.underline.red);
-			childPage.childLinks.forEach((childLink) => {
-				console.log(`\t${childLink}`);
-			})
-		})
-	});
-	// ------------------------------
 
-}).catch((error) => {
-	console.error(error);
-})
+var crawl = (link) => {
+    crawler.extractLinks(link).then((page) => {
+        
+        console.log(`${crawledPages} ${link}`);
+        //console.log(page.lastModifiedDate);
+        //console.log(page.pageSize);
+        //console.log(page.title);
+        checked[link] = true;
+        crawledPages++;
+        page.childLinks.forEach((link) => { queue.push(link); });
+        while(queue.length && checked[queue[0]])
+            queue.shift();
+        
+        if(queue.length && crawledPages < maxCrawlPages)
+            crawl(queue[0]);  // recursive crawling
+
+    }).catch((error) => {
+        console.error(error);
+    });
+};
+
+// Server starts
+crawl(queue[0]);
+
+
+// Dance Cycle
+setInterval(() => {
+    queue = [rootLink];
+    checked = {};
+    crawledPages = 0;
+    crawl(queue[0]);
+}, dancePeriod);

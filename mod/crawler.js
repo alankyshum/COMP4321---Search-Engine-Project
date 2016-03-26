@@ -18,18 +18,19 @@ module.exports = (() => {
 	// EXTRACT ALL LINKS ON A PAGE
 	var extractLinks = (link) => {
 		return new Promise((resolve, reject) => {
-
 			var decoder = new StringDecoder('utf8');
 			(~link.indexOf('http://')?http:https).get(link, (res) => {
 				res.on('data', (chunk) => {
 					var $ = cheerio.load(decoder.write(chunk));
 					var linkSet = new Set();
 					$('a[href]').each((a_i, a) => {
-						linkSet.add(($(a).attr('href').match(/http[s]?:\/\//)?"":link)+$(a).attr('href'));
+                        var path = $(a).attr('href').split('?')[0];
+                        if(path[0]=='/') path = path.slice(1);
+						linkSet.add(($(a).attr('href').match(/^http[s]?:\/\//)?"":link)+path);
 					});
 					resolve({
-						lastModifiedDate: new Date(res.headers["last-modified"]) || null,
-						pageSize: res.headers["content-length"] || null, // in bytes
+						lastModifiedDate: new Date(res.headers["last-modified"] || res.headers["date"]),
+						pageSize: res.headers["content-length"] || chunk.length, // in bytes
 						title: $('title').text() || "",
 						childLinks: Array.from(linkSet)
 					});
