@@ -1,20 +1,33 @@
 {
-  "name": "se",
-  "version": "0.0.0",
-  "private": true,
+  "name": "comp4321",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scrapper.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node scrapper.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/alankyshum/COMP4321_2016.git"
+  },
+  "keywords": [
+    "HKUST",
+    "COMP4321",
+    "Search",
+    "Engine"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/alankyshum/COMP4321_2016/issues"
+  },
+  "homepage": "https://gitlab.com/alankyshum/COMP4321_2016#README",
   "dependencies": {
-    "body-parser": "~1.13.2",
-    "cookie-parser": "~1.3.5",
-    "debug": "~2.2.0",
-    "express": "~4.13.1",
-    "htmlparser2": "^3.9.0",
-    "jade": "~1.11.0",
-    "mongodb": "^2.1.11",
-    "morgan": "~1.6.1",
-    "porter-stemmer": "^0.9.1",
-    "serve-favicon": "~2.3.0"
+    "firebase": "^2.4.1",
+    "x-ray": "^2.0.3"
+  },
+  "devDependencies": {
+    "colors": "^1.1.2"
   }
 }
