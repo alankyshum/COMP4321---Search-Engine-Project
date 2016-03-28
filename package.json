@@ -26,7 +26,9 @@
   "dependencies": {
     "cheerio": "^0.20.0",
     "firebase": "^2.4.1",
-    "follow-redirects": "0.0.7"
+    "follow-redirects": "0.0.7",
+    "md5": "^2.1.0",
+    "memory-cache": "^0.1.4"
   },
   "devDependencies": {
     "colors": "^1.1.2",

@@ -1,9 +1,9 @@
 # COMP4321 - Search Engine
 
 ## Proress - Phase 1
-- [ ] Implement a spider
-	- [ ] Crawler
-	- [ ] Index (30 pages from http://www.cse.ust.hk)
+- [X] Implement a spider
+	- [X] Crawler
+	- [X] Index (30 pages from http://www.cse.ust.hk)
 - [ ] Implement a test program which read data from the database
 	- [ ] Outputs a plain-text file named `spider_result.txt`
 - [ ] All supporting databases should be defined
@@ -34,5 +34,10 @@ Child Link2 .....
 1. `npm install`
 1. `node scrapper.js`
 
+## Wordarounds
+| Issue | Workaround |
+| --- | --- |
+| content-length (page-size) | length of response text from `http request` |
+| last modified date |  |
+
 ## CREDITS
-1. [X-Ray](https://github.com/lapwinglabs/x-ray) - Scrapper used in this project
