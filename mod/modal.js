@@ -1,3 +1,7 @@
+// OPTIONAL LIBRARY
+const colors = require('colors');
+const log = require('single-line-log').stdout;
+
 /**
  * MODULE :: MODAL
  * --------------------------
@@ -17,7 +21,30 @@ module.exports = (() => {
 		dataRef = new FIREBASE(LINKS.firebaseDB);
 	}
 
+	var writeFile = (page) => {
+
+		console.log(`${page.title}`.underline.green);
+		console.log(page.URL);
+		console.log(page.lastModifiedDate);
+		console.log(page.pageSize);
+
+		// GET PARENT-CHILD LINKING RELATIONSHIP OF ALL PAGES
+		page.childLinks.forEach((link) => {
+			console.log(`\t${link}`);
+		});
+		// ------------------------------
+
+		if (page.childPages) {
+			page.childPages.forEach((childPage) => {
+				writeFile(childPage);
+			});
+		} else {
+			return true;
+		}
+	}
+
 	return {
-		initDB: initDB;
+		initDB: initDB,
+		writeFile: writeFile
 	}
 })();

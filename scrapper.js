@@ -3,8 +3,7 @@ const stemmer = require('./vendor/porterStemmer');
 // DIVIDED MODULES
 const crawl = require('./mod/crawler');
 const stopword = require('./mod/stopword');
-// OPTIONAL LIBRARY
-const colors = require('colors');
+const modal = require('./mod/modal');
 
 
 // CREATE INDEX FROM DOCUMENTS
@@ -17,23 +16,19 @@ var index = {
 /**
  * MAIN FUNCTION
  */
-
+// crawl.extractLinks("http://www.walkndev.com").then((page) => {
 crawl.extractLinks("https://www.cse.ust.hk").then((page) => {
 
-	console.log(page.lastModifiedDate);
-	console.log(page.pageSize);
-	console.log(page.title);
-
 	// GET PARENT-CHILD LINKING RELATIONSHIP OF ALL PAGES
-	page.childLinks.forEach((link) => {
+	page.childLinks.forEach((link, link_i) => {
+		page.childPages = [];
 		crawl.extractLinks(link).then((childPage) => {
-			console.log(`${childPage.title}:\n${link}`.underline.red);
-			childPage.childLinks.forEach((childLink) => {
-				console.log(`\t${childLink}`);
-			})
-		})
+			page.childPages.push(childPage);
+			if (link_i == page.childLinks.length-1) modal.writeFile(page);
+		});
 	});
 	// ------------------------------
+
 
 }).catch((error) => {
 	console.error(error);

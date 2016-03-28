@@ -25,12 +25,13 @@ module.exports = (() => {
 					var $ = cheerio.load(decoder.write(chunk));
 					var linkSet = new Set();
 					$('a[href]').each((a_i, a) => {
-						linkSet.add(($(a).attr('href').match(/http[s]?:\/\//)?"":link)+$(a).attr('href'));
+						linkSet.add((($(a).attr('href').match(/http[s]?:\/\//)?"":link)+$(a).attr('href')).replace(/([^:])\/\//, '$1/'));
 					});
 					resolve({
+						title: $('title').text() || "",
+						URL: link,
 						lastModifiedDate: new Date(res.headers["last-modified"]) || null,
 						pageSize: res.headers["content-length"] || null, // in bytes
-						title: $('title').text() || "",
 						childLinks: Array.from(linkSet)
 					});
 				});
