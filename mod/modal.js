@@ -1,3 +1,6 @@
+// MANDATARY IMPORTS
+const config = require('../config.json');
+const FIREBASE = require('firebase');
 // OPTIONAL LIBRARY
 const colors = require('colors');
 const log = require('single-line-log').stdout;
@@ -9,42 +12,70 @@ const log = require('single-line-log').stdout;
  * HIGH-LEVEL WRAPPER FOR FIREBASE APIS
  */
 
-const FIREBASE = require('firebase');
-const LINKS = {
-	firebaseDB: "https://comp4321.firebaseio.com/"
-}
-
 module.exports = (() => {
 
-	var dataRef = null;
-	var initDB = () => {
-		dataRef = new FIREBASE(LINKS.firebaseDB);
+ //  ___   _ _____ _   ___   _   ___ ___
+ // |   \ /_\_   _/_\ | _ ) /_\ / __| __|
+ // | |) / _ \| |/ _ \| _ \/ _ \\__ \ _|
+ // |___/_/ \_\_/_/ \_\___/_/ \_\___/___|
+ //
+	var db = () => {
+		var returnFx = {};
+
+		var dataRef = new FIREBASE(config.firebaseDB);
+		returnFx.writeDB = () => {
+			// dataRef
+		}
+
+		return returnFx;
+	};
+
+
+ //  ___ ___ _    ___
+ // | __|_ _| |  | __|
+ // | _| | || |__| _|
+ // |_| |___|____|___|
+ //
+	var file = () => {
+		var returnFx = {};
+
+		/*
+			WRITE TO FILE
+		 */
+		returnFx.write = (page) => {
+			console.log(`${page.title}`.underline.green);
+			console.log(page.URL);
+			console.log(page.lastModifiedDate);
+			console.log(page.pageSize);
+			page.childLinks.forEach((link) => {
+				console.log(`\t${link}`);
+			});
+
+			if (page.childPages) {
+				page.childPages.forEach((childPage) => {
+					writeFile(childPage);
+				});
+			} else {
+				return true;
+			}
+		}
+
+		return returnFx;
 	}
 
-	var writeFile = (page) => {
 
-		console.log(`${page.title}`.underline.green);
-		console.log(page.URL);
-		console.log(page.lastModifiedDate);
-		console.log(page.pageSize);
+ //   ___   _   ___ _  _ ___
+ //  / __| /_\ / __| || | __|
+ // | (__ / _ \ (__| __ | _|
+ //  \___/_/ \_\___|_||_|___|
+ //
+	var cache = () => {
 
-		// GET PARENT-CHILD LINKING RELATIONSHIP OF ALL PAGES
-		page.childLinks.forEach((link) => {
-			console.log(`\t${link}`);
-		});
-		// ------------------------------
-
-		if (page.childPages) {
-			page.childPages.forEach((childPage) => {
-				writeFile(childPage);
-			});
-		} else {
-			return true;
-		}
 	}
 
 	return {
-		initDB: initDB,
-		writeFile: writeFile
+		db: db,
+		file: file,
+		cache: cache
 	}
 })();
