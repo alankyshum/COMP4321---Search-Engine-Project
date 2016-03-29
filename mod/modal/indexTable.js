@@ -12,8 +12,8 @@ module.exports.forward = () => {
    * BUILD
    * @param  {OBJECT} page object
    */
-  returnFx.insert(page) => {
-    
+  returnFx.insert = (page) => {
+
   }
 
   return returnFx;

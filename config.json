@@ -1,4 +1,6 @@
 {
   "rootURL": "https://www.cse.ust.hk",
-  "firebaseDB": "https://comp4321.firebaseio.com/"
+  "firebaseDB": "https://comp4321.firebaseio.com/",
+  "maxChildPages": 10,
+  "maxLevels": 5
 }

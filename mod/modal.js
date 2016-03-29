@@ -36,23 +36,25 @@ module.exports.cache = () => {
 	// -------------------------
 	// CRAWLED LINKS -----------
 	// -------------------------
+	returnFx.crawledLinks = {};
 	// GET LINKS EXISTING IN THE DATABASE
-	returnFx.crawledLink.init = () => {
+	returnFx.crawledLinks.init = () => {
 		// TODO: GET LIST OF LINKS EXISTINGS IN THE DATABASE
 		// FIXME: ASSUMED THEY WON'T CHANGE FOR A WHILE
 		// NEED TO CHECK LAST MODIFIED DATE
 
 	}
 	// GET A LIST OF ALL CRAWLED LINKS
-	returnFx.crawledLink.get = () => {
-		if (!cache.get('crawledLink')) {
-			// TODO: get from database
+	returnFx.crawledLinks.get = () => {
+		if (!cache.get('crawledLinks')) {
+			// FIXME: get from database
+			cache.put('crawledLinks', {});
 		}
-		return cache.get('crawledLink');
+		return cache.get('crawledLinks');
 	}
 	// RENEW THE LIST OF CRAWLED LINKS
-	returnFx.crawledLink.set = (value) => {
-		cache.put('crawledLink', value);
+	returnFx.crawledLinks.set = (value) => {
+		cache.put('crawledLinks', value);
 		// TODO: WRITE TO DATABASE
 	}
 
@@ -63,6 +65,6 @@ module.exports.cache = () => {
 // ==========================
 // EXPORTED LIBRARIES =======
 // ==========================
-module.exports.stopWords = require('modal/stopWords.js');
-module.exports.indexTable = require('modal/indexTable.js');
-module.exports.file = require('modal/file.js');
+module.exports.stopWords = require('./modal/stopWords.js');
+module.exports.indexTable = require('./modal/indexTable.js');
+module.exports.file = require('./modal/file.js');
