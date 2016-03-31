@@ -1,22 +1,28 @@
+const fs = require('fs');
+
+const nr = "\r\n";
+const seperator = "---------------------------------";
 /**
  * MODULE :: FILE
  * --------------------------
  * MODULE FOR HANDLING FILE OUTPUT
  */
-module.exports.write = (page) => {
-	console.log(`${page.title}`.underline.green);
-	console.log(page.URL);
-	console.log(page.lastModifiedDate);
-	console.log(page.pageSize);
-	page.childLinks.forEach((link) => {
-		console.log(`\t${link}`);
-	});
 
-	if (page.childPages) {
-		page.childPages.forEach((childPage) => {
-			returnFx.write(childPage);
-		});
-	} else {
-		return true;
-	}
+module.exports.writeSinglePage = (filename, page) => {
+	console.log(`[FILE WRITING] ${page.title}: ${page.URL}`);
+	var writeString = `${page.title}${nr}${page.URL}${nr}${page.lastModifiedDate}, ${page.pageSize}${nr}`;
+	// TODO: keyword frequency
+	page.childLinks.forEach((link) => {
+		writeString += `${link}${nr}`;
+	});
+	writeString += `${seperator}${nr}`;
+	fs.appendFile(filename, writeString, (err) => {
+		(err) && console.error(err);
+	});
+}
+
+module.exports.writeAll = (filename, pageArray) => {
+	pageArray.forEach((page) => {
+		module.exports.writeSinglePage(filename, page);
+	})
 }
