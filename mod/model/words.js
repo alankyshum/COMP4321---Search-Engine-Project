@@ -6,6 +6,7 @@
 const fs = require('fs');
 const cache = require('memory-cache');
 const stemmer = require('porter-stemmer').stemmer;
+const indexTable = require('model').indexTable;
 
 // CHECK IF WORD IS STOP WORD
 var is = (word) => {
@@ -22,8 +23,9 @@ var wordFreq = (body) => {
 		return !is(word)
 	}).map(stemmer).forEach((word) => {
 		word = word.toLowerCase();
-		if (!wordFreq[word]) wordFreq[word] = 0;
-		wordFreq[word]++;
+		var _wordID = indexTable.wordID.get(word);
+		if (!wordFreq[_wordID]) wordFreq[_wordID] = 0;
+		wordFreq[_wordID]++;
 	})
 	return wordFreq;
 }

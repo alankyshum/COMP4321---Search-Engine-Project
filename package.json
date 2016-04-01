@@ -25,9 +25,9 @@
   "homepage": "https://bitbucket.org/a100438a13/se",
   "dependencies": {
     "cheerio": "^0.20.0",
-    "firebase": "^2.4.1",
     "follow-redirects": "0.0.7",
     "memory-cache": "^0.1.4",
+    "mongoose": "^4.4.10",
     "porter-stemmer": "^0.9.1"
   },
   "devDependencies": {

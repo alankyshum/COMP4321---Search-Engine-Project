@@ -1,6 +1,6 @@
 {
   "rootURL": "https://www.cse.ust.hk",
-  "firebaseDB": "https://comp4321.firebaseio.com/",
+  "mongoDB": "mongodb://comp4321:comp4321@ds011800.mlab.com:11800/comp4321",
   "resultFile": "spider_result.txt",
   "maxChildPages": 10,
   "maxLevels": 1

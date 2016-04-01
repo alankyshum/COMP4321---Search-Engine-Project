@@ -8,7 +8,7 @@ const http = require('follow-redirects').http;
 const https = require('follow-redirects').https;
 const cheerio = require('cheerio');
 const StringDecoder = require('string_decoder').StringDecoder;
-const modal = require('./modal');
+const model = require('./model');
 
 // EXTRACT ALL LINKS ON A PAGE
 module.exports.extractLinks = (link) => {
@@ -32,7 +32,7 @@ module.exports.extractLinks = (link) => {
 					lastModifiedDate: res.headers["last-modified"] && new Date(res.headers["last-modified"]) || new Date(res.headers["date"]),
 					pageSize: res.headers["content-length"] || chunk.length, // in bytes
 					childLinks: Array.from(linkSet),
-					wordFreq: $('body').text()?modal.words.wordFreq($('body').text()):{}
+					wordFreq: $('body').text()?model.words.wordFreq($('body').text()):{}
 				});
 			});
 		}).on('error', (err) => {
@@ -45,7 +45,7 @@ module.exports.extractLinks = (link) => {
 // RECURSIVELY EXTRACT LINK
 module.exports.recursiveExtractLink = (link, cb) => {
 	'use strict';
-	var crawledLinks = modal.cache().crawledLinks.get();
+	var crawledLinks = {};
 	var allPages = []; // object to be written to result.txt
 	var _queue = [link], _levels = {};
 
