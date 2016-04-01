@@ -3,5 +3,5 @@
   "firebaseDB": "https://comp4321.firebaseio.com/",
   "resultFile": "spider_result.txt",
   "maxChildPages": 10,
-  "maxLevels": 5
+  "maxLevels": 1
 }

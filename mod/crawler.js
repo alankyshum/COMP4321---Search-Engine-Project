@@ -3,17 +3,12 @@
  * --------------------------
  * FUNCTIONS OCRAWL WORDS AND LINKS ON A PAGE
  */
+const config = require('../config.json');
 const http = require('follow-redirects').http;
 const https = require('follow-redirects').https;
 const cheerio = require('cheerio');
 const StringDecoder = require('string_decoder').StringDecoder;
-const config = require('../config.json');
 const modal = require('./modal');
-
-// EXTRACT WORDS + FREQUENCIES FROM A PAGE
-module.exports.extractWords = (body) => {
-	return body.replace(/[\n|\t|,|.|\(|\)|\:|\/|\\|\-|\[|\]]/g, ' ').split(' ');
-}
 
 // EXTRACT ALL LINKS ON A PAGE
 module.exports.extractLinks = (link) => {
@@ -22,17 +17,22 @@ module.exports.extractLinks = (link) => {
 		var decoder = new StringDecoder('utf8');
 		(~link.indexOf('http://')?http:https).get(link, (res) => {
 			res.on('data', (chunk) => {
+				console.log(`[debug] ${link}`);
 				var $ = cheerio.load(decoder.write(chunk));
+
+				// LIKNS
 				var linkSet = new Set();
 				$('a[href]').each((a_i, a) => {
 					linkSet.add((($(a).attr('href').match(/http[s]?:\/\//)?"":link)+$(a).attr('href')).replace(/([^:])\/\//, '$1/'));
 				});
+
 				resolve({
 					title: $('title').text() || "",
 					URL: link,
 					lastModifiedDate: new Date(res.headers["last-modified"]) || null,
 					pageSize: res.headers["content-length"] || chunk.length, // in bytes
-					childLinks: Array.from(linkSet)
+					childLinks: Array.from(linkSet),
+					wordFreq: $('body').text()?modal.words.wordFreq($('body').text()):{}
 				});
 			});
 		}).on('error', (err) => {
@@ -54,7 +54,7 @@ module.exports.recursiveExtractLink = (link, cb) => {
 		if (_levels[link] > config.maxLevels) {
 			cb(allPages);
 		} else {
-			console.log(`${_levels[link]}th level: ${link}`);
+			// console.log(`${_levels[link]}th level: ${link}`);
 			module.exports.extractLinks(link).then((page) => {
 				crawledLinks[link] = true;
 				allPages.push(page);

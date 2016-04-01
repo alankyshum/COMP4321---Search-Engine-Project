@@ -29,7 +29,7 @@ module.exports.db = () => {
 
 // CACHE
 // GENERAL-PURPOSE CACHE, NOT FITTING IN ANY
-// DEDICATED MODAL, LIKE FILE, INDEXTABLE, OR STOPWORDS
+// DEDICATED MODAL, LIKE FILE, INDEXTABLE, OR WORDS
 module.exports.cache = () => {
 	var returnFx = {};
 
@@ -65,6 +65,6 @@ module.exports.cache = () => {
 // ==========================
 // EXPORTED LIBRARIES =======
 // ==========================
-module.exports.stopWords = require('./modal/stopWords.js');
+module.exports.words = require('./modal/words.js');
 module.exports.indexTable = require('./modal/indexTable.js');
 module.exports.file = require('./modal/file.js');

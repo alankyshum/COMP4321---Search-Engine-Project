@@ -1,17 +1,29 @@
 const fs = require('fs');
 
-const nr = "\r\n";
-const seperator = "---------------------------------";
+const nr = "\r\n",
+	seperator = "---------------------------------";
 /**
  * MODULE :: FILE
  * --------------------------
  * MODULE FOR HANDLING FILE OUTPUT
  */
 
+module.exports.cleanFile = (filename) => {
+	console.log("CLEANING FILE");
+	fs.writeFile(filename, '', (err) => {
+		if (err) console.error(err);
+	})
+}
+
 module.exports.writeSinglePage = (filename, page) => {
 	console.log(`[FILE WRITING] ${page.title}: ${page.URL}`);
 	var writeString = `${page.title}${nr}${page.URL}${nr}${page.lastModifiedDate}, ${page.pageSize}${nr}`;
-	// TODO: keyword frequency
+
+	Object.keys(page.wordFreq).forEach((word) => {
+		writeString += `${word} ${page.wordFreq[word]}; `
+	});
+	writeString += nr;
+
 	page.childLinks.forEach((link) => {
 		writeString += `${link}${nr}`;
 	});
