@@ -23,13 +23,14 @@ module.exports.extractLinks = (link) => {
 				// LIKNS
 				var linkSet = new Set();
 				$('a[href]').each((a_i, a) => {
-					linkSet.add((($(a).attr('href').match(/http[s]?:\/\//)?"":link)+$(a).attr('href')).replace(/([^:])\/\//, '$1/'));
+					linkSet.add((($(a).attr('href').match(/http[s]?:\/\//)?"":link)+$(a).attr('href')).replace(/([^:])\/\//, '$1/').replace(/\/+$/, ''));
 				});
 
 				resolve({
 					title: $('title').text() || "",
-					URL: link,
+					url: link.replace(/\/+$/, ''),
 					lastModifiedDate: res.headers["last-modified"] && new Date(res.headers["last-modified"]) || new Date(res.headers["date"]),
+					lastCrawlDate: new Date(),
 					pageSize: res.headers["content-length"] || chunk.length, // in bytes
 					childLinks: Array.from(linkSet),
 					wordFreq: $('body').text()?model.words.wordFreq($('body').text()):{}
@@ -43,7 +44,9 @@ module.exports.extractLinks = (link) => {
 }
 
 // RECURSIVELY EXTRACT LINK
-module.exports.recursiveExtractLink = (link, cb) => {
+// middleCB: Callback for each successful page crawl
+// finalCB: Callback after everything's done
+module.exports.recursiveExtractLink = (link, middleCB, finalCB) => {
 	'use strict';
 	var crawledLinks = {};
 	var allPages = []; // object to be written to result.txt
@@ -52,12 +55,13 @@ module.exports.recursiveExtractLink = (link, cb) => {
 	var crawlChild = (link) => {
 		if (!_levels[link]) _levels[link] = 0;
 		if (_levels[link] > config.maxLevels) {
-			cb(allPages);
+			finalCB(allPages);
 		} else {
 			// console.log(`${_levels[link]}th level: ${link}`);
 			module.exports.extractLinks(link).then((page) => {
 				crawledLinks[link] = true;
 				allPages.push(page);
+				middleCB(page);
 				var loopLimit = Math.min(page.childLinks.length-1, config.maxChildPages);
 				page.childLinks.every((childLink, link_i) => {
 					if (link_i < loopLimit) {

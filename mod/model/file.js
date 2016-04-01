@@ -16,8 +16,8 @@ module.exports.cleanFile = (filename) => {
 }
 
 module.exports.writeSinglePage = (filename, page) => {
-	console.log(`[FILE WRITING] ${page.title}: ${page.URL}`);
-	var writeString = `${page.title}${nr}${page.URL}${nr}${page.lastModifiedDate}, ${page.pageSize}${nr}`;
+	console.log(`[FILE WRITING] ${page.title}: ${page.url}`);
+	var writeString = `${page.title}${nr}${page.url}${nr}${page.lastModifiedDate}, ${page.pageSize}${nr}`;
 
 	Object.keys(page.wordFreq).forEach((word) => {
 		writeString += `${word} ${page.wordFreq[word]}; `
