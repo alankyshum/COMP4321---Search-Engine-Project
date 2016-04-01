@@ -1,15 +1,15 @@
 {
   "name": "comp4321",
   "version": "1.0.0",
-  "description": "",
-  "main": "scrapper.js",
+  "description": "NodeJS based search engine built for COMP4321 - HKUST, 2016 Spring",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node scrapper.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/alankyshum/COMP4321_2016.git"
+    "url": "git+git@bitbucket.org:a100438a13/se.git"
   },
   "keywords": [
     "HKUST",
@@ -22,7 +22,7 @@
   "bugs": {
     "url": "https://gitlab.com/alankyshum/COMP4321_2016/issues"
   },
-  "homepage": "https://gitlab.com/alankyshum/COMP4321_2016#README",
+  "homepage": "https://bitbucket.org/a100438a13/se",
   "dependencies": {
     "cheerio": "^0.20.0",
     "firebase": "^2.4.1",

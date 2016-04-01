@@ -21,6 +21,7 @@ var wordFreq = (body) => {
 	wordList.filter((word) => {
 		return !is(word)
 	}).map(stemmer).forEach((word) => {
+		word = word.toLowerCase();
 		if (!wordFreq[word]) wordFreq[word] = 0;
 		wordFreq[word]++;
 	})

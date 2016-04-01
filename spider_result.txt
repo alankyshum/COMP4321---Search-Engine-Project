@@ -1,7 +1,7 @@
 Department of Computer Science and Engineering, HKUST
 https://www.cse.ust.hk
-Invalid Date, 16384
-0 8; 1 1; 2 1; 3 1; 4 1; 2014 2; 2015 11; About 2; Welcom 1; Us 2; Fact 1; Sheet 1; New 6; Achievement 2; Event 1; Qualiti 1; Assuranc 1; Safeti 1; Contact 1; Peopl 1; Faculti 3; Staff 1; Commun 1; Tutor 1; Postgradu 3; Student 4; Alumni 3; Recruit 4; Editor 1; Chief 1; Appointment 1; Undergradu 2; UG 3; Program 7; Intranet 4; Yr 2; PG 4; CSE 4; Admission 3; Destin 1; Research 1; Career 2; Internship 1; Opportun 1; Info 1; Employer 1; Useful 1; Link 2; Servic 1; Facil 2; Committe 1; Polici 1; Lab 2; Schedul 1; User 1; Guid 1; CS 1; System 1; WebMail 1; MyPort 1; Team 1; Societi 1; Associat 1; Site 1; Map 1; Caption 2; imag 1; var 5; bannerCaptionArr 2; The 5; Hong 3; Kong 3; Univers 2; Scienc 3; Technolog 5; Mentorship 2; Hackathon 2; HKUST 6; Android 2; Applicat 2; Design 2; Contest 2; Tea 2; Gather 2; Professor 5; Samuel 2; Chanson 2; Scholarship 2; Award 3; href 4; http 4; alumni 2; cse 2; ust 4; hk 4; mentorship 2; html 2; hack 2; AADC2014 2; SCSA2014 2; bannerLinkArr 1; Option 1; Note 1; MUST 1; Normal 1; With 2; background 3; font 2; Larger 1; Text 1; larger 1; Special 1; NO 2; text 1; bannerMod 1; bannerCaptionColor 1; white 6; Depart 2; Global 1; Celebr 1; San 1; Francisco 1; Qian 1; ZHANG 1; appoint 1; Tencent 1; Engineer 2; Chair 1; Comput 1; PhD 1; Graduat 1; Receiv 1; Young 1; Scientist 1; Big 2; Data 2; Master 1; fill 1; skill 1; shortag 1; MOE 1; MSRA 1; Informat 1; Kei 1; Laboratori 1; AI 1; Workshop 1; Microsoft 1; Club 1; formal 1; Establish 2; MSc 1; offici 1; approv 1; launch 1; Dec 1; 9th 1; Famili 1; Homecom 1; Dai 1; WeChat 1; Joint 1; Artifici 1; Intellig 1; 
+Fri Apr 01 2016 14:28:29 GMT+0800 (HKT), 16384
+0 8; 1 1; 2 1; 3 1; 4 1; 2014 2; 2015 11; about 2; welcom 1; us 2; fact 1; sheet 1; new 6; achievement 2; event 1; qualiti 1; assuranc 1; safeti 1; contact 1; peopl 1; faculti 3; staff 1; commun 1; tutor 1; postgradu 3; student 4; alumni 5; recruit 4; editor 1; chief 1; appointment 1; undergradu 2; ug 3; program 7; intranet 4; yr 2; pg 4; cse 6; admission 3; destin 1; research 1; career 2; internship 1; opportun 1; info 1; employer 1; useful 1; link 2; servic 1; facil 2; committe 1; polici 1; lab 2; schedul 1; user 1; guid 1; cs 1; system 1; webmail 1; myport 1; team 1; societi 1; associat 1; site 1; map 1; caption 2; imag 1; var 5; bannercaptionarr 2; the 5; hong 3; kong 3; univers 2; scienc 3; technolog 5; mentorship 4; hackathon 2; hkust 6; android 2; applicat 2; design 2; contest 2; tea 2; gather 2; professor 5; samuel 2; chanson 2; scholarship 2; award 3; href 4; http 4; ust 4; hk 4; html 2; hack 2; aadc2014 2; scsa2014 2; bannerlinkarr 1; option 1; note 1; must 1; normal 1; with 2; background 3; font 2; larger 2; text 2; special 1; no 2; bannermod 1; bannercaptioncolor 1; white 6; depart 2; global 1; celebr 1; san 1; francisco 1; qian 1; zhang 1; appoint 1; tencent 1; engineer 2; chair 1; comput 1; phd 1; graduat 1; receiv 1; young 1; scientist 1; big 2; data 2; master 1; fill 1; skill 1; shortag 1; moe 1; msra 1; informat 1; kei 1; laboratori 1; ai 1; workshop 1; microsoft 1; club 1; formal 1; establish 2; msc 1; offici 1; approv 1; launch 1; dec 1; 9th 1; famili 1; homecom 1; dai 1; wechat 1; joint 1; artifici 1; intellig 1; 
 https://www.cse.ust.hk/
 https://www.cse.ust.hk?lang=hk
 https://www.cse.ust.hk?lang=cn
@@ -66,10 +66,78 @@ http://www.sengpp.ust.hk/programs/bdt/en/
 https://www.cse.ust.hk/News/AlumniDay2015/
 http://www.ust.hk/about-hkust/media-relations/press-releases/hkust-wechat-establish-joint-lab-artificial-intelligence-technology-2/
 ---------------------------------
+Department of Computer Science and Engineering, HKUST
+https://www.cse.ust.hk/
+Fri Apr 01 2016 14:28:29 GMT+0800 (HKT), 16384
+0 8; 1 1; 2 1; 3 1; 4 1; 2014 2; 2015 11; about 2; welcom 1; us 2; fact 1; sheet 1; new 6; achievement 2; event 1; qualiti 1; assuranc 1; safeti 1; contact 1; peopl 1; faculti 3; staff 1; commun 1; tutor 1; postgradu 3; student 4; alumni 5; recruit 4; editor 1; chief 1; appointment 1; undergradu 2; ug 3; program 7; intranet 4; yr 2; pg 4; cse 6; admission 3; destin 1; research 1; career 2; internship 1; opportun 1; info 1; employer 1; useful 1; link 2; servic 1; facil 2; committe 1; polici 1; lab 2; schedul 1; user 1; guid 1; cs 1; system 1; webmail 1; myport 1; team 1; societi 1; associat 1; site 1; map 1; caption 2; imag 1; var 5; bannercaptionarr 2; the 5; hong 3; kong 3; univers 2; scienc 3; technolog 5; mentorship 4; hackathon 2; hkust 6; android 2; applicat 2; design 2; contest 2; tea 2; gather 2; professor 5; samuel 2; chanson 2; scholarship 2; award 3; href 4; http 4; ust 4; hk 4; html 2; hack 2; aadc2014 2; scsa2014 2; bannerlinkarr 1; option 1; note 1; must 1; normal 1; with 2; background 3; font 2; larger 2; text 2; special 1; no 2; bannermod 1; bannercaptioncolor 1; white 6; depart 2; global 1; celebr 1; san 1; francisco 1; qian 1; zhang 1; appoint 1; tencent 1; engineer 2; chair 1; comput 1; phd 1; graduat 1; receiv 1; young 1; scientist 1; big 2; data 2; master 1; fill 1; skill 1; shortag 1; moe 1; msra 1; informat 1; kei 1; laboratori 1; ai 1; workshop 1; microsoft 1; club 1; formal 1; establish 2; msc 1; offici 1; approv 1; launch 1; dec 1; 9th 1; famili 1; homecom 1; dai 1; wechat 1; joint 1; artifici 1; intellig 1; 
+https://www.cse.ust.hk/
+https://www.cse.ust.hk/?lang=hk
+https://www.cse.ust.hk/?lang=cn
+http://www.ust.hk/
+http://www.seng.ust.hk/
+https://www.cse.ust.hk/admin/sitemap/?map=About
+https://www.cse.ust.hk/admin/welcome/
+https://www.cse.ust.hk/admin/about/
+https://www.cse.ust.hk/admin/factsheet/
+https://www.cse.ust.hk/News/?type=news|achievement
+https://www.cse.ust.hk/News/?type=event
+https://www.cse.ust.hk/admin/QA/
+http://cssystem.cse.ust.hk/UGuides/csd_manage.html
+https://www.cse.ust.hk/admin/contact/
+https://www.cse.ust.hk/admin/sitemap/?map=People
+https://www.cse.ust.hk/admin/people/faculty/
+https://www.cse.ust.hk/admin/people/staff/
+https://www.cse.ust.hk/ct/
+https://www.cse.ust.hk/admin/people/pg/
+https://www.cse.ust.hk/alumni/
+https://www.cse.ust.hk/admin/recruitment/
+https://www.cse.ust.hk/admin/people/eic/
+https://www.cse.ust.hk/admin/sitemap/?map=Undergraduate
+https://www.cse.ust.hk/ug/
+https://www.cse.ust.hk/ug/hkust_only/4yr/
+https://www.cse.ust.hk/ug/hkust_only/
+https://www.cse.ust.hk/admin/sitemap/?map=Postgraduate
+https://www.cse.ust.hk/pg/
+https://www.cse.ust.hk/pg/hkust_only/
+https://www.cse.ust.hk/pg/admissions/recruiting/
+http://pg.ust.hk/admissions
+https://www.cse.ust.hk/pg/ourgraduates/
+https://www.cse.ust.hk/pg/research/
+https://www.cse.ust.hk/admin/sitemap/?map=Career
+https://www.cse.ust.hk/ug/internship/
+https://www.cse.ust.hk/ug/internship/forEmployer/
+https://www.cse.ust.hk/ug/career/service/
+https://www.cse.ust.hk/admin/sitemap/?map=Facilities
+https://www.cse.ust.hk/admin/facilities/committee/
+https://www.cse.ust.hk/admin/lab/
+http://cssystem.cse.ust.hk/UGuides/index.html
+http://cssystem.cse.ust.hk/
+https://www.cse.ust.hk/admin/sitemap/?map=Links
+https://imail.cse.ust.hk/sqmail/
+https://www.cse.ust.hk/Restricted/
+http://my.ust.hk
+https://www.cse.ust.hk/acm/
+http://ihome.ust.hk/~su_csess/
+https://www.facebook.com/cseaa.hkust
+https://www.cse.ust.hk/admin/sitemap/
+https://www.cse.ust.hk/ug/admissions/
+http://alumni.cse.ust.hk/mentorship.html
+http://hack.ust.hk/
+https://www.cse.ust.hk/News/AADC2014/
+https://www.cse.ust.hk/News/SCSA2014/
+https://www.cse.ust.hk/News/global-celebration-sfo/
+https://www.cse.ust.hk/News/Qian_Zhang2016/
+https://www.cse.ust.hk/News/HKIS_YoungScientist2015/
+https://www.cse.ust.hk/News/BDT2016/
+https://www.cse.ust.hk/News/MicrosoftStudentClub2015/
+http://www.sengpp.ust.hk/programs/bdt/en/
+https://www.cse.ust.hk/News/AlumniDay2015/
+http://www.ust.hk/about-hkust/media-relations/press-releases/hkust-wechat-establish-joint-lab-artificial-intelligence-technology-2/
+---------------------------------
 香港科技大學計算機科學及工程學系
 https://www.cse.ust.hk?lang=hk
-Invalid Date, 16384
-0 8; 1 1; 2 1; 2014 2; 2015 11; English 1; UG 1; Program 3; MyPort 1; Caption 2; imag 1; var 5; bannerCaptionArr 2; The 4; Hong 2; Kong 2; Univers 2; Scienc 3; Technolog 2; Mentorship 2; Hackathon 2; HKUST 2; Android 2; Applicat 2; Design 2; Contest 2; CSE 3; Tea 2; Gather 2; Professor 5; Samuel 2; Chanson 2; Scholarship 3; Award 3; href 4; http 4; alumni 2; cse 2; ust 4; hk 4; mentorship 2; html 2; hack 2; New 4; AADC2014 2; SCSA2014 2; bannerLinkArr 1; Option 1; Note 1; MUST 1; Normal 1; With 2; background 3; font 2; Larger 1; Text 1; larger 1; Special 1; NO 2; text 1; bannerMod 1; bannerCaptionColor 1; white 6; Undergradu 1; Admission 2; Postgradu 1; Global 1; Celebr 1; San 1; Francisco 1; Qian 1; ZHANG 1; appoint 1; Tencent 1; Engineer 2; Chair 1; Depart 1; Comput 1; Alumni 1; Famili 1; Homecom 1; Dai 1; Creat 1; predict 1; futur 1; data 1; PhD 1; Student 1; Googl 1; Anita 1; Borg 1; Memori 1; 
+Fri Apr 01 2016 14:28:29 GMT+0800 (HKT), 16384
+0 8; 1 1; 2 1; 2014 2; 2015 11; english 1; ug 1; program 3; myport 1; caption 2; imag 1; var 5; bannercaptionarr 2; the 4; hong 2; kong 2; univers 2; scienc 3; technolog 2; mentorship 4; hackathon 2; hkust 2; android 2; applicat 2; design 2; contest 2; cse 5; tea 2; gather 2; professor 5; samuel 2; chanson 2; scholarship 3; award 3; href 4; http 4; alumni 3; ust 4; hk 4; html 2; hack 2; new 4; aadc2014 2; scsa2014 2; bannerlinkarr 1; option 1; note 1; must 1; normal 1; with 2; background 3; font 2; larger 2; text 2; special 1; no 2; bannermod 1; bannercaptioncolor 1; white 6; undergradu 1; admission 2; postgradu 1; global 1; celebr 1; san 1; francisco 1; qian 1; zhang 1; appoint 1; tencent 1; engineer 2; chair 1; depart 1; comput 1; famili 1; homecom 1; dai 1; creat 1; predict 1; futur 1; data 1; phd 1; student 1; googl 1; anita 1; borg 1; memori 1; 
 https://www.cse.ust.hk?lang=hk/
 https://www.cse.ust.hk?lang=hk?lang=en
 https://www.cse.ust.hk?lang=hk?lang=cn
@@ -136,78 +204,10 @@ http://www.ust.hk/zh-hant/abouthkust-zh-hant/media-relations-zh-hant/press-relea
 http://www.scmp.com/presented/business/topics/hkust-25th-anniversary/article/1884178/creating-predictive-future-big-data
 https://www.cse.ust.hk?lang=hk/News/AnitaBorg2015/
 ---------------------------------
-Department of Computer Science and Engineering, HKUST
-https://www.cse.ust.hk/
-Invalid Date, 16384
-0 8; 1 1; 2 1; 3 1; 4 1; 2014 2; 2015 11; About 2; Welcom 1; Us 2; Fact 1; Sheet 1; New 6; Achievement 2; Event 1; Qualiti 1; Assuranc 1; Safeti 1; Contact 1; Peopl 1; Faculti 3; Staff 1; Commun 1; Tutor 1; Postgradu 3; Student 4; Alumni 3; Recruit 4; Editor 1; Chief 1; Appointment 1; Undergradu 2; UG 3; Program 7; Intranet 4; Yr 2; PG 4; CSE 4; Admission 3; Destin 1; Research 1; Career 2; Internship 1; Opportun 1; Info 1; Employer 1; Useful 1; Link 2; Servic 1; Facil 2; Committe 1; Polici 1; Lab 2; Schedul 1; User 1; Guid 1; CS 1; System 1; WebMail 1; MyPort 1; Team 1; Societi 1; Associat 1; Site 1; Map 1; Caption 2; imag 1; var 5; bannerCaptionArr 2; The 5; Hong 3; Kong 3; Univers 2; Scienc 3; Technolog 5; Mentorship 2; Hackathon 2; HKUST 6; Android 2; Applicat 2; Design 2; Contest 2; Tea 2; Gather 2; Professor 5; Samuel 2; Chanson 2; Scholarship 2; Award 3; href 4; http 4; alumni 2; cse 2; ust 4; hk 4; mentorship 2; html 2; hack 2; AADC2014 2; SCSA2014 2; bannerLinkArr 1; Option 1; Note 1; MUST 1; Normal 1; With 2; background 3; font 2; Larger 1; Text 1; larger 1; Special 1; NO 2; text 1; bannerMod 1; bannerCaptionColor 1; white 6; Depart 2; Global 1; Celebr 1; San 1; Francisco 1; Qian 1; ZHANG 1; appoint 1; Tencent 1; Engineer 2; Chair 1; Comput 1; PhD 1; Graduat 1; Receiv 1; Young 1; Scientist 1; Big 2; Data 2; Master 1; fill 1; skill 1; shortag 1; MOE 1; MSRA 1; Informat 1; Kei 1; Laboratori 1; AI 1; Workshop 1; Microsoft 1; Club 1; formal 1; Establish 2; MSc 1; offici 1; approv 1; launch 1; Dec 1; 9th 1; Famili 1; Homecom 1; Dai 1; WeChat 1; Joint 1; Artifici 1; Intellig 1; 
-https://www.cse.ust.hk/
-https://www.cse.ust.hk/?lang=hk
-https://www.cse.ust.hk/?lang=cn
-http://www.ust.hk/
-http://www.seng.ust.hk/
-https://www.cse.ust.hk/admin/sitemap/?map=About
-https://www.cse.ust.hk/admin/welcome/
-https://www.cse.ust.hk/admin/about/
-https://www.cse.ust.hk/admin/factsheet/
-https://www.cse.ust.hk/News/?type=news|achievement
-https://www.cse.ust.hk/News/?type=event
-https://www.cse.ust.hk/admin/QA/
-http://cssystem.cse.ust.hk/UGuides/csd_manage.html
-https://www.cse.ust.hk/admin/contact/
-https://www.cse.ust.hk/admin/sitemap/?map=People
-https://www.cse.ust.hk/admin/people/faculty/
-https://www.cse.ust.hk/admin/people/staff/
-https://www.cse.ust.hk/ct/
-https://www.cse.ust.hk/admin/people/pg/
-https://www.cse.ust.hk/alumni/
-https://www.cse.ust.hk/admin/recruitment/
-https://www.cse.ust.hk/admin/people/eic/
-https://www.cse.ust.hk/admin/sitemap/?map=Undergraduate
-https://www.cse.ust.hk/ug/
-https://www.cse.ust.hk/ug/hkust_only/4yr/
-https://www.cse.ust.hk/ug/hkust_only/
-https://www.cse.ust.hk/admin/sitemap/?map=Postgraduate
-https://www.cse.ust.hk/pg/
-https://www.cse.ust.hk/pg/hkust_only/
-https://www.cse.ust.hk/pg/admissions/recruiting/
-http://pg.ust.hk/admissions
-https://www.cse.ust.hk/pg/ourgraduates/
-https://www.cse.ust.hk/pg/research/
-https://www.cse.ust.hk/admin/sitemap/?map=Career
-https://www.cse.ust.hk/ug/internship/
-https://www.cse.ust.hk/ug/internship/forEmployer/
-https://www.cse.ust.hk/ug/career/service/
-https://www.cse.ust.hk/admin/sitemap/?map=Facilities
-https://www.cse.ust.hk/admin/facilities/committee/
-https://www.cse.ust.hk/admin/lab/
-http://cssystem.cse.ust.hk/UGuides/index.html
-http://cssystem.cse.ust.hk/
-https://www.cse.ust.hk/admin/sitemap/?map=Links
-https://imail.cse.ust.hk/sqmail/
-https://www.cse.ust.hk/Restricted/
-http://my.ust.hk
-https://www.cse.ust.hk/acm/
-http://ihome.ust.hk/~su_csess/
-https://www.facebook.com/cseaa.hkust
-https://www.cse.ust.hk/admin/sitemap/
-https://www.cse.ust.hk/ug/admissions/
-http://alumni.cse.ust.hk/mentorship.html
-http://hack.ust.hk/
-https://www.cse.ust.hk/News/AADC2014/
-https://www.cse.ust.hk/News/SCSA2014/
-https://www.cse.ust.hk/News/global-celebration-sfo/
-https://www.cse.ust.hk/News/Qian_Zhang2016/
-https://www.cse.ust.hk/News/HKIS_YoungScientist2015/
-https://www.cse.ust.hk/News/BDT2016/
-https://www.cse.ust.hk/News/MicrosoftStudentClub2015/
-http://www.sengpp.ust.hk/programs/bdt/en/
-https://www.cse.ust.hk/News/AlumniDay2015/
-http://www.ust.hk/about-hkust/media-relations/press-releases/hkust-wechat-establish-joint-lab-artificial-intelligence-technology-2/
----------------------------------
 香港科技大学计算机科学及工程学系
 https://www.cse.ust.hk?lang=cn
-Invalid Date, 16384
-0 8; 1 1; 2 1; 2014 2; 2015 11; English 1; UG 1; Program 3; MyPort 1; Caption 2; imag 1; var 5; bannerCaptionArr 2; The 4; Hong 2; Kong 2; Univers 2; Scienc 3; Technolog 2; Mentorship 2; Hackathon 2; HKUST 2; Android 2; Applicat 2; Design 2; Contest 2; CSE 3; Tea 2; Gather 2; Professor 5; Samuel 2; Chanson 2; Scholarship 3; Award 3; href 4; http 4; alumni 2; cse 2; ust 4; hk 4; mentorship 2; html 2; hack 2; New 4; AADC2014 2; SCSA2014 2; bannerLinkArr 1; Option 1; Note 1; MUST 1; Normal 1; With 2; background 3; font 2; Larger 1; Text 1; larger 1; Special 1; NO 2; text 1; bannerMod 1; bannerCaptionColor 1; white 6; Undergradu 1; Admission 2; Postgradu 1; Global 1; Celebr 1; San 1; Francisco 1; Qian 1; ZHANG 1; appoint 1; Tencent 1; Engineer 2; Chair 1; Depart 1; Comput 1; Alumni 1; Famili 1; Homecom 1; Dai 1; Creat 1; predict 1; futur 1; data 1; PhD 1; Student 1; Googl 1; Anita 1; Borg 1; Memori 1; 
+Fri Apr 01 2016 14:28:52 GMT+0800 (HKT), 16384
+0 8; 1 1; 2 1; 2014 2; 2015 11; english 1; ug 1; program 3; myport 1; caption 2; imag 1; var 5; bannercaptionarr 2; the 4; hong 2; kong 2; univers 2; scienc 3; technolog 2; mentorship 4; hackathon 2; hkust 2; android 2; applicat 2; design 2; contest 2; cse 5; tea 2; gather 2; professor 5; samuel 2; chanson 2; scholarship 3; award 3; href 4; http 4; alumni 3; ust 4; hk 4; html 2; hack 2; new 4; aadc2014 2; scsa2014 2; bannerlinkarr 1; option 1; note 1; must 1; normal 1; with 2; background 3; font 2; larger 2; text 2; special 1; no 2; bannermod 1; bannercaptioncolor 1; white 6; undergradu 1; admission 2; postgradu 1; global 1; celebr 1; san 1; francisco 1; qian 1; zhang 1; appoint 1; tencent 1; engineer 2; chair 1; depart 1; comput 1; famili 1; homecom 1; dai 1; creat 1; predict 1; futur 1; data 1; phd 1; student 1; googl 1; anita 1; borg 1; memori 1; 
 https://www.cse.ust.hk?lang=cn/
 https://www.cse.ust.hk?lang=cn?lang=en
 https://www.cse.ust.hk?lang=cn?lang=hk

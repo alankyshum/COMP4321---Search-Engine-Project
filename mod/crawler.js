@@ -29,7 +29,7 @@ module.exports.extractLinks = (link) => {
 				resolve({
 					title: $('title').text() || "",
 					URL: link,
-					lastModifiedDate: new Date(res.headers["last-modified"]) || null,
+					lastModifiedDate: res.headers["last-modified"] && new Date(res.headers["last-modified"]) || new Date(res.headers["date"]),
 					pageSize: res.headers["content-length"] || chunk.length, // in bytes
 					childLinks: Array.from(linkSet),
 					wordFreq: $('body').text()?modal.words.wordFreq($('body').text()):{}
