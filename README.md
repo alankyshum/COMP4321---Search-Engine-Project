@@ -4,12 +4,12 @@
 - [X] Implement a spider
 	- [X] Crawler
 	- [X] Index (30 pages from http://www.cse.ust.hk)
-- [ ] Implement a test program which read data from the database
-	- [ ] Outputs a plain-text file named `spider_result.txt`
+- [X] Implement a test program which read data from the database
+	- [X] Outputs a plain-text file named `spider_result.txt`
 - [ ] All supporting databases should be defined
 	- [ ] Forward and inverted indexes
-	- [ ] Mapping tables for URL <=> page ID
-	- [ ] Word <=> word ID
+	- [X] Mapping tables for URL <=> page ID
+	- [X] Word <=> word ID
 
 ### Format of `spider_result.txt`
 ```plain-text
