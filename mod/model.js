@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+const config = require('../config.json');
 /**
  * MODULE :: model
  * --------------------------
@@ -7,21 +9,19 @@
 // --------------------------
 // SCHEMA -------------------
 // --------------------------
-const mongoose = require('mongoose');
-const config = require('../config.json');
 const Schema = mongoose.Schema;
 if (mongoose.connection.readyState === 0) {
   mongoose.connect(config.mongoDB);
+  console.log(`DATABASE CONNECTED ... `);
 }
+
 var _schema = {};
-_schema.wordID = new Schema({
-  word: {type: String, unique: true},
-  wordID: {type: Number, min: 0}
+// GET WORD ID FROM WORDLIST -- _ID
+_schema.wordList = new Schema({
+  word: {type: String, unique: true}
 });
-_schema.pageID = new Schema({
-  url: {type: String, unique: true},
-  urlID: {type: Number, min: 0}
-});
+
+// GET PAGE ID FROM PAGE INFO -- _ID
 _schema.pageInfo = new Schema({
   title: String,
   url: String,
@@ -29,7 +29,8 @@ _schema.pageInfo = new Schema({
   lastCrawlDate: Date,
   size: Number,
   childLinks: [String]
-})
+});
+
 _schema.forwardTable = new Schema({
   docID: {type: Number, min: 0},
   words: [{
@@ -37,6 +38,7 @@ _schema.forwardTable = new Schema({
     freq: {type: Number, min: 0}
   }]
 });
+
 _schema.invertedTable = new Schema({
   wordID: {type: Number, min: 0},
   docs: [{
@@ -44,14 +46,13 @@ _schema.invertedTable = new Schema({
     freq: {type: Number, min: 0}
   }]
 });
+
 module.exports.dbModel = {
-  wordID: mongoose.model('wordID', _schema.wordID),
-  pageID: mongoose.model('pageID', _schema.pageID),
+  wordList: mongoose.model('wordList', _schema.wordList),
+  pageInfo: mongoose.model('pageInfo', _schema.pageInfo)
   forwardTable: mongoose.model('forwardTable', _schema.forwardTable),
   invertedTable: mongoose.model('invertedTable', _schema.invertedTable),
-  pageInfo: mongoose.model('pageInfo', _schema.pageInfo)
 }
-
 
 
 // --------------------------
