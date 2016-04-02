@@ -5,7 +5,7 @@ const model = require('./mod/model');
 
 crawl.recursiveExtractLink(config.rootURL, (page) => {
 	model.indexTable.page.upsert(page);
-	model.indexTable.pageID.upsert(page.url);
+	model.indexTable.word.upsert(Object.keys(page.wordFreq));
 }, (allPages) => {
 	model.file.cleanFile(config.resultFile);
 	model.file.writeAll(config.resultFile, allPages);

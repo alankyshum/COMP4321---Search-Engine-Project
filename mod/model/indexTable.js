@@ -10,18 +10,29 @@ const colors = require('colors');
 
  // WORD ID TABLE :: WORD LIST
  // --------------------------
- module.exports.wordList = (() => {
+ module.exports.word = (() => {
    var returnFx = {};
 
-   returnFx.get = (word) => {
-
-   }
-
-   returnFx.getWord = (id) => {
-   }
-
-   returnFx.exists = (word) => {
-
+   returnFx.upsert = (wordList) => {
+     wordList = wordList.map((word) => {
+       return {"word": word}
+     });
+     var _logHead = "[MODEL/INDEXTABLE/WORD/UPSERT]";
+     console.info(`${_logHead}\tUpserting ${wordList.length} words`.green);
+     return new Promise((resolve, reject) => {
+       model.dbModel.wordList.collection.insert(wordList, (err, docs) => {
+         if (err) {
+           if (err.code == "11000") {
+             console.info(`\tduplicated word found`)
+           } else {
+             console.error(err); reject(err);
+           }
+         } else {
+           console.info(`${_logHead}\tUpserted ${docs.length} words`.green);
+           resolve();
+         }
+       })
+     }) // end:: Promise
    }
 
    return returnFx;
@@ -34,7 +45,7 @@ module.exports.page = (() => {
 
   returnFx.upsert = (page) => {
     var _logHead = "[MODEL/INDEXTABLE/PAGE/UPSERT]";
-    console.log(`${_logHead}\tUpserting Page: ${page.url}`.green);
+    console.info(`${_logHead}\tUpserting Page: ${page.url}`.green);
     return new Promise((resolve, reject) => {
       var _newPageInfo = {
         title: page.title,
@@ -50,7 +61,7 @@ module.exports.page = (() => {
       }, _newPageInfo, {upsert: true}, (err, raw) => {
         if (err) {console.error(err); eject(err);}
         else {
-          console.log(`${_logHead}\tUpserted URL: ${page.url}`.green);
+          console.info(`${_logHead}\tUpserted URL: ${page.url}`.green);
           resolve();
         }
       });

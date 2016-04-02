@@ -49,7 +49,7 @@ _schema.invertedTable = new Schema({
 
 module.exports.dbModel = {
   wordList: mongoose.model('wordList', _schema.wordList),
-  pageInfo: mongoose.model('pageInfo', _schema.pageInfo)
+  pageInfo: mongoose.model('pageInfo', _schema.pageInfo),
   forwardTable: mongoose.model('forwardTable', _schema.forwardTable),
   invertedTable: mongoose.model('invertedTable', _schema.invertedTable),
 }
