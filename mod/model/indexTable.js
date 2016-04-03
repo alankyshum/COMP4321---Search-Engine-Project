@@ -1,4 +1,4 @@
-const model = require('../model');
+const model = require('../model'); // [need review] strange dependency, model <=> indexTable
 const colors = require('colors');
 /**
  * MODULE:: FORWARD + INVERTED INDEX
@@ -29,7 +29,10 @@ module.exports.word = (() => {
             reject(err);
           }
         } else {
-          console.info(`${_logHead}\tUpserted ${docs.length} words`.green);
+          console.info(`${_logHead}\tUpserted ${docs.length} words`.green);    
+            // [need review - I am not sure how many times this cb is run, But ...] 
+            // if callback run once => one word duplicated => all words not insert?
+            // if callback run many, docs.length useless (always = 1)
           resolve();
         }
       }) // end:: insert
@@ -87,7 +90,7 @@ module.exports.page = (() => {
         url: page.url,
         lastCrawlDate: {$gt: new Date(page.lastCrawlDate.getDate()-1)}
       }, _newPageInfo, {upsert: true}, (err, raw) => {
-        if (err) {console.error(err); eject(err);}
+        if (err) {console.error(err); reject(err);}
         else {
           console.info(`${_logHead}\tUpserted URL: ${page.url}`.green);
           resolve();
@@ -132,12 +135,35 @@ module.exports.page = (() => {
 module.exports.forward = (() => {
   var returnFx = {};
 
-  returnFx.setDoc = (page) => {
-
+  returnFx.upsert = (wordFreqArray, id) => {
+    var _logHead = "[MODEL/INDEXTABLE/FORWARD/UPSERT]";
+    
+    return new Promise((resolve, reject) => {
+      
+      model.dbModel.forwardTable.update({
+        docID: id
+      }, {
+        docID: id,
+        $addToSet: { words: { $each: wordFreqArray } }
+      }, {upsert: true}, (err, raw) => {
+        if (err) {console.error(err); reject(err);}
+        else {
+          console.info(`${_logHead}\tUpserted Forward List: ${id}`.green);
+          resolve();
+        }
+      });
+      
+    });
   }
 
-  returnFx.getDocList = () => {
-
+  returnFx.getDocList = (id) => {
+    return new Promise((resolve, reject) => {
+      
+      model.dbModel.forwardTable.find({docID: id}, 'words', (err, words) => {
+        if (err) {console.error(err); reject(err)}
+        resolve(words);
+      });
+    });
   }
 
   return returnFx;
@@ -148,6 +174,52 @@ module.exports.forward = (() => {
 // --------------------------
 module.exports.inverted = (() => {
   var returnFx = {};
+  
+  returnFx.upsert = (wordFreq, id) => {
+    var _logHead = "[MODEL/INDEXTABLE/INVERTED/UPSERT]";
+    
+    return new Promise((resolve, reject) => {
+      
+      Object.keys(wordFreq).forEach((key) => {
+        
+        model.dbModel.invertedTable.update({
+          wordID: key,
+          "docs.docID": id
+        }, { 
+          $set: { "docs.$.freq": wordFreq[key] }
+        }, (err, raw) => {
+          if (err) { console.log("asd"); console.error(err); reject(err);}
+          else {
+            if(!raw.nMatched)
+              model.dbModel.invertedTable.update({
+                wordID: key
+              }, {
+                $addToSet: { docs: { docID: id, freq: wordFreq[key]} }
+              }, (err, raw) => {
+                if (err) {console.error(err); reject(err);}
+                else {
+                  console.info(`${_logHead}\tInserted posting for ${key}: ${id}-${wordFreq[key]}`.green);
+                  resolve();
+                }
+              });
+            else {
+              console.info(`${_logHead}\tUpdated posting for ${key}: ${id}-${wordFreq[key]}`.green);                  
+              resolve();
+            }
+          } 
+        });
+        
+      });
+        
+    });
+  };
+  
+  returnFx.getWordPosting = ((wordID) => {
+    model.dbModel.invertedTable.find({wordID: wordID}, '', (err, postings) => {
+      if (err) {console.error(err); reject(err)}
+      resolve(postings);
+    });
+  });
 
   return returnFx;
 })();

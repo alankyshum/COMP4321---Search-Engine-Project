@@ -17,6 +17,7 @@ if (mongoose.connection.readyState === 0) {
 
 var _schema = {};
 // GET WORD ID FROM WORDLIST -- _ID
+// [BUG] _ID is not number, please change it to auto-increment with number starting from 0
 _schema.wordList = new Schema({
   word: {type: String, unique: true}
 });

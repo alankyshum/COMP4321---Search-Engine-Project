@@ -2,15 +2,30 @@ const config = require('./config.json');
 const crawl = require('./mod/crawler');
 const model = require('./mod/model');
 
+
+// [TODO: Batch update/insert - Not using batch is too slow, reason: over network => please abandon mongolab in production release]
+// [TODO: Add Database Cleaning so that all crawling test can be done everytime start the server]
 crawl.recursiveExtractLink(config.rootURL, (page) => {
 	model.indexTable.page.upsert(page);
+  
 	model.indexTable.word.upsert(Object.keys(page.wordFreq));
+  
+  var wordToID = {}, IDToWordFreq = {}, IDToWordFreqArray = [];
+  model.indexTable.word.getAllID().then((ids) => {
+    ids.forEach((element) => { wordToID[element.word] = element._id; });
+    Object.keys(page.wordFreq).forEach((key, index) => { IDToWordFreq[wordToID[key]] = page.wordFreq[key]; IDToWordFreqArray[index] = {wordID: wordToID[key], freq: page.wordFreq[key]} });
+    model.indexTable.page.getID(page.url).then((pageID) => {
+      model.indexTable.inverted.upsert(IDToWordFreq, pageID);
+      model.indexTable.forward.upsert(IDToWordFreqArray, pageID);
+    });
+  });  
+  
 }, (allPages) => {
 	model.file.cleanFile(config.resultFile);
 	model.file.writeAll(config.resultFile, allPages);
 });
 
-// TODO: Ivan : Check here for API use case
+
 // model.indexTable.word.getAllID().then((wordIDList) => {
 // 	console.log(wordIDList.length);
 // });

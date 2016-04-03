@@ -46,6 +46,7 @@ module.exports.extractLinks = (link) => {
 // RECURSIVELY EXTRACT LINK
 // middleCB: Callback for each successful page crawl
 // finalCB: Callback after everything's done
+// [TODO: Dance Cycle + Checking last modified date in second, third ... dance before fetching]
 module.exports.recursiveExtractLink = (link, middleCB, finalCB) => {
 	'use strict';
 	var crawledLinks = {};
@@ -63,7 +64,7 @@ module.exports.recursiveExtractLink = (link, middleCB, finalCB) => {
 				allPages.push(page);
 				middleCB(page);
 				var loopLimit = Math.min(page.childLinks.length-1, config.maxChildPages);
-				page.childLinks.every((childLink, link_i) => {
+				page.childLinks.every((childLink, link_i) => {     // [need review] strange logic
 					if (link_i < loopLimit) {
 						_levels[childLink] = _levels[link] + 1;
 						_queue.push(childLink);
@@ -73,7 +74,8 @@ module.exports.recursiveExtractLink = (link, middleCB, finalCB) => {
 					}
 				});
 				while (_queue.length && crawledLinks[_queue[0]]) _queue.shift();
-				_queue.length && crawlChild(_queue[0]);
+				
+        if(_queue.length) crawlChild(_queue[0]);
 			})
 		}
 	}

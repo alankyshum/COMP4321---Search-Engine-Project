@@ -26,13 +26,13 @@ Child Link2 .....
 | Name | Email | Student ID |
 | --- | --- | --- |
 | Alan Shum | kyshum@ust.hk | 20110916 |
-| Ivan Fung | placeholder | placeholder |
+| Ivan Fung | hlfungaa@connect.ust.hk | placeholder |
 
 ## To start
 1. Install `Node.JS`, `npm`
 1. `cd <path to this project, root>`
 1. `npm install`
-1. `node scrapper.js`
+1. `npm start`
 
 ## Wordarounds
 | Issue | Workaround |
