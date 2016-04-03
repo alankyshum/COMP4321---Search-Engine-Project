@@ -214,8 +214,9 @@ module.exports.inverted = (() => {
     });
   };
   
-  returnFx.getWordPosting = ((wordID) => {
-    model.dbModel.invertedTable.find({wordID: wordID}, '', (err, postings) => {
+  returnFx.getWordPosting = ((wordID, limit) => {
+    var query = typeof limit===undefined?{wordID: wordID}:{wordID: wordID, docs: {$slice: limit} };  // default parameter (limit)
+    model.dbModel.invertedTable.find(query, 'docs', (err, postings) => {
       if (err) {console.error(err); reject(err)}
       resolve(postings);
     });
