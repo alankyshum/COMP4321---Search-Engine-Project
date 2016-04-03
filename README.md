@@ -39,5 +39,6 @@ Child Link2 .....
 | --- | --- |
 | content-length (page-size) | length of response text from `http request` |
 | last modified date |  |
+| Schema Auto-generated String ID (Instead of number) Bug |  |
 
 ## CREDITS
