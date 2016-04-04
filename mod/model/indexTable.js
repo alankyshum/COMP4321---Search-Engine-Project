@@ -23,7 +23,8 @@ module.exports.word = (() => {
       model.dbModel.wordList.collection.insert(wordList, (err, docs) => {
         if (err) {
           if (err.code == "11000") {
-            console.info(`\tduplicated word found`)
+            console.info(`\tduplicated word found`);
+            resolve();
           } else {
             console.error(err);
             reject(err);
@@ -188,7 +189,7 @@ module.exports.inverted = (() => {
         }, { 
           $set: { "docs.$.freq": wordFreq[key] }
         }, (err, raw) => {
-          if (err) { console.log("asd"); console.error(err); reject(err);}
+          if (err) {console.error(err); reject(err);}
           else {
             if(!raw.nMatched)
               model.dbModel.invertedTable.update({
@@ -198,12 +199,12 @@ module.exports.inverted = (() => {
               }, (err, raw) => {
                 if (err) {console.error(err); reject(err);}
                 else {
-                  console.info(`${_logHead}\tInserted posting for ${key}: ${id}-${wordFreq[key]}`.green);
+                  console.info(`${_logHead}\tInserted posting for Word[${key}]: Page[${id}] - Freq[${wordFreq[key]}]`.green);
                   resolve();
                 }
               });
             else {
-              console.info(`${_logHead}\tUpdated posting for ${key}: ${id}-${wordFreq[key]}`.green);                  
+              console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreq[key]}]`.green);                  
               resolve();
             }
           } 

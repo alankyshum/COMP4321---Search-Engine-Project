@@ -17,7 +17,6 @@ if (mongoose.connection.readyState === 0) {
 
 var _schema = {};
 // GET WORD ID FROM WORDLIST -- _ID
-// [BUG] _ID is not number, please change it to auto-increment with number starting from 0
 _schema.wordList = new Schema({
   word: {type: String, unique: true}
 });
@@ -33,17 +32,17 @@ _schema.pageInfo = new Schema({
 });
 
 _schema.forwardTable = new Schema({
-  docID: {type: Number, min: 0},
+  docID: {type: mongoose.Schema.ObjectId, min: 0},
   words: [{
-    wordID: {type: Number, min: 0},
+    wordID: {type: mongoose.Schema.ObjectId, min: 0},
     freq: {type: Number, min: 0}
   }]
 });
 
 _schema.invertedTable = new Schema({
-  wordID: {type: Number, min: 0},
+  wordID: {type: mongoose.Schema.ObjectId, min: 0},
   docs: [{
-    docID: {type: Number, min: 0},
+    docID: {type: mongoose.Schema.ObjectId, min: 0},
     freq: {type: Number, min: 0}
   }]
 });
