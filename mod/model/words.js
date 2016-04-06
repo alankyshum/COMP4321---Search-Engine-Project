@@ -18,6 +18,9 @@ module.exports.is = is;
 var wordFreq = (body) => {
 	var wordFreq = {};
 	var wordList = body.match(/\w+/g); // match word
+  
+  if(wordList==null) return {};  // bug fix: wordList can be null in some pages
+  
 	wordList.filter((word) => {
 		return !is(word)
 	}).map(stemmer).forEach((word) => {

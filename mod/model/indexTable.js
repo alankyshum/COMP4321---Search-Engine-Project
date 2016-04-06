@@ -14,30 +14,22 @@ module.exports.word = (() => {
   var returnFx = {};
 
   returnFx.upsert = (wordList) => {
-    wordList = wordList.map((word) => {
-      return {"word": word}
-    });
     var _logHead = "[MODEL/INDEXTABLE/WORD/UPSERT]";
-    console.info(`${_logHead}\tUpserting ${wordList.length} words`.green);
+    
     return new Promise((resolve, reject) => {
-      model.dbModel.wordList.collection.insert(wordList, (err, docs) => {
-        if (err) {
-          if (err.code == "11000") {
-            console.info(`\tduplicated word found`);
+      var check = 0;
+      wordList.forEach((word) => {
+        model.dbModel.wordList.collection.update({word: word}, {word: word}, {upsert: true}, (err, docs) => {
+          if(err){ console.log(err); reject(err); }
+
+          // All Words have been inserted => resolve promise
+          if(++check==Object.keys(wordList).length){   // [need review] racing conditions
+            console.info(`${_logHead}\tUpserting <${wordList.length} words`.green);
             resolve();
-          } else {
-            console.error(err);
-            reject(err);
           }
-        } else {
-          console.info(`${_logHead}\tUpserted ${docs.length} words`.green);    
-            // [need review - I am not sure how many times this cb is run, But ...] 
-            // if callback run once => one word duplicated => all words not insert?
-            // if callback run many, docs.length useless (always = 1)
-          resolve();
-        }
-      }) // end:: insert
-    }) // end:: Promise
+        });
+      });
+    });
   }
 
   returnFx.getAllID = () => {
@@ -77,7 +69,6 @@ module.exports.page = (() => {
 
   returnFx.upsert = (page) => {
     var _logHead = "[MODEL/INDEXTABLE/PAGE/UPSERT]";
-    console.info(`${_logHead}\tUpserting Page: ${page.url}`.green);
     return new Promise((resolve, reject) => {
       var _newPageInfo = {
         title: page.title,
@@ -196,7 +187,7 @@ module.exports.inverted = (() => {
                 wordID: key
               }, {
                 $addToSet: { docs: { docID: id, freq: wordFreq[key]} }
-              }, (err, raw) => {
+              }, {upsert: true}, (err, raw) => {
                 if (err) {console.error(err); reject(err);}
                 else {
                   console.info(`${_logHead}\tInserted posting for Word[${key}]: Page[${id}] - Freq[${wordFreq[key]}]`.green);

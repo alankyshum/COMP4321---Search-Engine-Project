@@ -1,7 +1,6 @@
 {
   "rootURL": "https://www.cse.ust.hk",
-  "mongoDB": "mongodb://comp4321:comp4321@ds011800.mlab.com:11800/comp4321",
+  "mongoDB": "mongodb://localhost:27017/test",
   "resultFile": "spider_result.txt",
-  "maxChildPages": 10,
-  "maxLevels": 2
+  "maxPages": 100
 }

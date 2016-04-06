@@ -8,21 +8,20 @@ const model = require('./mod/model');
 crawl.recursiveExtractLink(config.rootURL, (page) => {
 	model.indexTable.page.upsert(page);
   
-	model.indexTable.word.upsert(Object.keys(page.wordFreq));
+	model.indexTable.word.upsert(Object.keys(page.wordFreq)).then(() => {
   
-  var wordToID = {}, IDToWordFreq = {}, IDToWordFreqArray = [];
-  model.indexTable.word.getAllID().then((ids) => {
-    ids.forEach((element) => { wordToID[element.word] = element._id; });
-    Object.keys(page.wordFreq).forEach((key, index) => { 
-      if(wordToID[key] == undefined)   // BUG: the list getAllID() does NOT contain some words
-        console.log(`BUG - ${key} is not in getAllID() list`);
-      IDToWordFreq[wordToID[key]] = page.wordFreq[key]; IDToWordFreqArray[index] = {wordID: wordToID[key], freq: page.wordFreq[key]} 
-    });
-    model.indexTable.page.getID(page.url).then((pageID) => {
-      model.indexTable.inverted.upsert(IDToWordFreq, pageID);
-      model.indexTable.forward.upsert(IDToWordFreqArray, pageID);
-    });
-  });  
+    var wordToID = {}, IDToWordFreq = {}, IDToWordFreqArray = [];
+    model.indexTable.word.getAllID().then((ids) => {
+      ids.forEach((element) => { wordToID[element.word] = element._id; });
+      Object.keys(page.wordFreq).forEach((key, index) => {
+        IDToWordFreq[wordToID[key]] = page.wordFreq[key]; IDToWordFreqArray[index] = {wordID: wordToID[key], freq: page.wordFreq[key]} 
+      });
+      model.indexTable.page.getID(page.url).then((pageID) => {
+        model.indexTable.inverted.upsert(IDToWordFreq, pageID);
+        model.indexTable.forward.upsert(IDToWordFreqArray, pageID);
+      });
+    });  
+  });
   
 }, (allPages) => {
 	model.file.cleanFile(config.resultFile);
