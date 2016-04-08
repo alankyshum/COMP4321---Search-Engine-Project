@@ -2,5 +2,5 @@
   "rootURL": "https://www.cse.ust.hk",
   "mongoDB": "mongodb://localhost:27017/test",
   "resultFile": "spider_result.txt",
-  "maxPages": 100
+  "maxPages": 40
 }
