@@ -80,7 +80,7 @@ module.exports.page = (() => {
       };
       model.dbModel.pageInfo.update({
         url: page.url,
-        lastCrawlDate: {$gt: new Date(page.lastCrawlDate.getDate()-1)}
+        lastCrawlDate: {$gt: new Date(page.lastCrawlDate.getTime()-1)}
       }, _newPageInfo, {upsert: true}, (err, raw) => {
         if (err) {console.error(err); reject(err);}
         else {
@@ -167,36 +167,67 @@ module.exports.forward = (() => {
 module.exports.inverted = (() => {
   var returnFx = {};
   
-  returnFx.upsert = (wordFreq, id) => {
-    var _logHead = "[MODEL/INDEXTABLE/INVERTED/UPSERT]";
+  returnFx.upsert = (wordFreqTitle, wordFreqBody, id) => {
+    var check = 0;
     
     return new Promise((resolve, reject) => {
       
-      Object.keys(wordFreq).forEach((key) => {
-        
-        model.dbModel.invertedTable.update({
+      Object.keys(wordFreqTitle).forEach((key) => {
+        var _logHead = "[MODEL/INDEXTABLE/INVERTEDTITLE/UPSERT]";
+        model.dbModel.invertedTableTitle.update({
           wordID: key,
           "docs.docID": id
         }, { 
-          $set: { "docs.$.freq": wordFreq[key] }
+          $set: { "docs.$.freq": wordFreqTitle[key] }
         }, (err, raw) => {
           if (err) {console.error(err); reject(err);}
           else {
             if(!raw.nMatched)
-              model.dbModel.invertedTable.update({
+              model.dbModel.invertedTableTitle.update({
                 wordID: key
               }, {
-                $addToSet: { docs: { docID: id, freq: wordFreq[key]} }
+                $addToSet: { docs: { docID: id, freq: wordFreqTitle[key]} }
               }, {upsert: true}, (err, raw) => {
                 if (err) {console.error(err); reject(err);}
                 else {
-                  console.info(`${_logHead}\tInserted posting for Word[${key}]: Page[${id}] - Freq[${wordFreq[key]}]`.green);
-                  resolve();
+                  //console.info(`${_logHead}\tInserted posting for Word[${key}]: Page[${id}] - Freq[${wordFreqTitle[key]}]`.green);
+                  if(++check==2) resolve();
                 }
               });
             else {
-              console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreq[key]}]`.green);                  
-              resolve();
+              //console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreqTitle[key]}]`.green);                  
+              if(++check==2) resolve();
+            }
+          } 
+        });
+        
+      });
+      
+      Object.keys(wordFreqBody).forEach((key) => {
+        var _logHead = "[MODEL/INDEXTABLE/INVERTEDBODY/UPSERT]";
+        model.dbModel.invertedTableBody.update({
+          wordID: key,
+          "docs.docID": id
+        }, { 
+          $set: { "docs.$.freq": wordFreqBody[key] }
+        }, (err, raw) => {
+          if (err) {console.error(err); reject(err);}
+          else {
+            if(!raw.nMatched)
+              model.dbModel.invertedTableBody.update({
+                wordID: key
+              }, {
+                $addToSet: { docs: { docID: id, freq: wordFreqBody[key]} }
+              }, {upsert: true}, (err, raw) => {
+                if (err) {console.error(err); reject(err);}
+                else {
+                  //console.info(`${_logHead}\tInserted posting for Word[${key}]: Page[${id}] - Freq[${wordFreqBody[key]}]`.green);
+                  if(++check==2) resolve();
+                }
+              });
+            else {
+             // console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreqBody[key]}]`.green);                  
+              if(++check==2) resolve();
             }
           } 
         });
@@ -206,7 +237,7 @@ module.exports.inverted = (() => {
     });
   };
   
-  returnFx.getWordPosting = ((wordID, limit) => {
+  returnFx.getWordPosting = ((wordID, listNum, limit) => {   // [listNum] 0: Title, 1: Body
     var query = typeof limit===undefined?{wordID: wordID}:{wordID: wordID, docs: {$slice: limit} };  // default parameter (limit)
     model.dbModel.invertedTable.find(query, 'docs', (err, postings) => {
       if (err) {console.error(err); reject(err)}

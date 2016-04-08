@@ -8,16 +8,24 @@ const model = require('./mod/model');
 crawl.recursiveExtractLink(config.rootURL, (page) => {
 	model.indexTable.page.upsert(page);
   
-	model.indexTable.word.upsert(Object.keys(page.wordFreq)).then(() => {
+	model.indexTable.word.upsert(Object.keys(page.wordFreqTitle).concat(Object.keys(page.wordFreqBody))).then(() => {
   
-    var wordToID = {}, IDToWordFreq = {}, IDToWordFreqArray = [];
+    var wordToID = {}, IDToWordFreqTitle = {}, IDToWordFreqBody = {}, IDToWordFreqArray = [];
     model.indexTable.word.getAllID().then((ids) => {
       ids.forEach((element) => { wordToID[element.word] = element._id; });
-      Object.keys(page.wordFreq).forEach((key, index) => {
-        IDToWordFreq[wordToID[key]] = page.wordFreq[key]; IDToWordFreqArray[index] = {wordID: wordToID[key], freq: page.wordFreq[key]} 
+      
+      Object.keys(page.wordFreqTitle).forEach((key) => {
+        IDToWordFreqTitle[wordToID[key]] = page.wordFreqTitle[key];
+        IDToWordFreqArray.push({wordID: wordToID[key], freq: page.wordFreqTitle[key]});
       });
+      
+      Object.keys(page.wordFreqBody).forEach((key) => {
+        IDToWordFreqBody[wordToID[key]] = page.wordFreqBody[key];
+        IDToWordFreqArray.push({wordID: wordToID[key], freq: page.wordFreqBody[key]});
+      });
+      
       model.indexTable.page.getID(page.url).then((pageID) => {
-        model.indexTable.inverted.upsert(IDToWordFreq, pageID);
+        model.indexTable.inverted.upsert(IDToWordFreqTitle, IDToWordFreqBody, pageID);
         model.indexTable.forward.upsert(IDToWordFreqArray, pageID);
       });
     });  

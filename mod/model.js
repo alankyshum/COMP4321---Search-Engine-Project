@@ -24,25 +24,25 @@ _schema.wordList = new Schema({
 // GET PAGE ID FROM PAGE INFO -- _ID
 _schema.pageInfo = new Schema({
   title: String,
-  url: String,
+  url: {type: String, unique: true},
   lastModifiedDate: Date,
   lastCrawlDate: Date,
-  size: Number,
+  size: {type: Number, min: 0},
   childLinks: [String]
 });
 
 _schema.forwardTable = new Schema({
-  docID: {type: mongoose.Schema.ObjectId, min: 0},
+  docID: mongoose.Schema.ObjectId,
   words: [{
-    wordID: {type: mongoose.Schema.ObjectId, min: 0},
+    wordID: mongoose.Schema.ObjectId,
     freq: {type: Number, min: 0}
   }]
 });
 
 _schema.invertedTable = new Schema({
-  wordID: {type: mongoose.Schema.ObjectId, min: 0},
+  wordID: mongoose.Schema.ObjectId,
   docs: [{
-    docID: {type: mongoose.Schema.ObjectId, min: 0},
+    docID: mongoose.Schema.ObjectId,
     freq: {type: Number, min: 0}
   }]
 });
@@ -51,7 +51,8 @@ module.exports.dbModel = {
   wordList: mongoose.model('wordList', _schema.wordList),
   pageInfo: mongoose.model('pageInfo', _schema.pageInfo),
   forwardTable: mongoose.model('forwardTable', _schema.forwardTable),
-  invertedTable: mongoose.model('invertedTable', _schema.invertedTable),
+  invertedTableTitle: mongoose.model('invertedTableTitle', _schema.invertedTable),
+  invertedTableBody: mongoose.model('invertedTableBody', _schema.invertedTable)
 }
 
 

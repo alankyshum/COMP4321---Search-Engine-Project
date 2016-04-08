@@ -36,7 +36,9 @@ module.exports.extractLinks = (link) => {
 					lastCrawlDate: new Date(),
 					pageSize: res.headers["content-length"] || data.length,
 					childLinks: Array.from(linkSet),   // [need review] child link needs to be inserted
-					wordFreq: $('body').text()?model.words.wordFreq($('body').text()):{}
+          wordFreqTitle: $('title').text()?model.words.wordFreq($('title').text()):{},
+					wordFreqBody: $('body').text()?model.words.wordFreq($('body').text()):{},
+          wordFreq: $('body, title').text()?model.words.wordFreq($('body, title').text()):{}
 				});
       });
 		

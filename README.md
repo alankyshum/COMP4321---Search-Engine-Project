@@ -6,8 +6,8 @@
 	- [X] Index (30 pages from http://www.cse.ust.hk)
 - [X] Implement a test program which read data from the database
 	- [X] Outputs a plain-text file named `spider_result.txt`
-- [ ] All supporting databases should be defined
-	- [ ] Forward and inverted indexes
+- [X] All supporting databases should be defined
+	- [X] Forward and inverted indexes
 	- [X] Mapping tables for URL <=> page ID
 	- [X] Word <=> word ID
 
@@ -26,10 +26,10 @@ Child Link2 .....
 | Name | Email | Student ID |
 | --- | --- | --- |
 | Alan Shum | kyshum@ust.hk | 20110916 |
-| Ivan Fung | hlfungaa@connect.ust.hk | placeholder |
+| Ivan Fung | hlfungaa@connect.ust.hk | 20115291 |
 
 ## To start
-1. Install `Node.JS`, `npm`
+1. Install `Node.JS`, `npm`, `MongoDB`
 1. `cd <path to this project, root>`
 1. `npm install`
 1. `npm start`
@@ -39,6 +39,6 @@ Child Link2 .....
 | --- | --- |
 | content-length (page-size) | length of response text from `http request` |
 | last modified date |  |
-| word.etAllID() does not contain some words Bug |  |
+
 
 ## CREDITS
