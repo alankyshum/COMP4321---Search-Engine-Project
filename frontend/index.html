@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>COMP4321 - Search Engine</title>
+		<style media="screen">
+			[data-layer='1'] {
+				z-index: 1;
+			}
+			.queryForm {
+				height: 100%;
+				width: 100%;
+				display: flex;
+				position: fixed;
+				background: transparent;
+			}
+			.results {
+				-webkit-filter: blur(5px);
+			}
+			input#query {
+				margin: auto;
+				display: block;
+				font-size: 48px;
+				border: none;
+				color: #545454;
+				text-align: center;
+				font-weight: 100;
+				font-family: Helvetica Neue, Source Sans Pro, Century Gothic, Sans-serif;
+			}
+			input#query:focus {
+		    outline: none;
+			}
+			input#query.shrinkToLoadingBar {
+				animate: shrinkToLoadingBar linear 1s;
+			}
+			@-webkit-keyframe shrinkToLoadingBar {
+				0% {
+					color: #fff;
+					background-color: transparent;
+				}
+				10% {
+					background-color: #ff;
+					color: #545454;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<form class='queryForm' data-layer='1' onsubmit="form.submit()">
+			<input id='query' type="text">
+		</form>
+		<div class="results" data-layer='2'>
+			Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		</div>
+
+		<script>
+			// ----------------
+			// GLOBAL VARAIBLES
+			// ----------------
+			var query = {
+				DOM: document.getElementById('query')
+			};
+
+			// --------------
+			// CORE FUNCTIONS
+			// --------------
+			document.onkeypress = (e) => {
+				query.DOM.focus();
+			}
+
+			// FORM RELATED
+			var form = {};
+			var form.submit = () => {
+				// animate loading
+				query.DOM.classList.add('shrinkToLoadingBar');
+
+				// xhr call to server
+			}
+		</script>
+	</body>
+</html>
