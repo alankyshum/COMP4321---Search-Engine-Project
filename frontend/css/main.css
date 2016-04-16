@@ -25,6 +25,8 @@
     #queryForm #query.shrinkToLoadingBar {
       -webkit-animation: shrinkToLoadingBar ease-out 3s infinite;
               animation: shrinkToLoadingBar ease-out 3s infinite; }
+  #queryForm #soundEffect {
+    display: none; }
 
 #results {
   -webkit-filter: blur(5px);

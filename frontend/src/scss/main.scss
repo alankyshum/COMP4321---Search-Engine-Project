@@ -35,6 +35,9 @@ $darkGrey: #545454;
       animation: shrinkToLoadingBar ease-out 3s infinite;
     }
   }
+  #soundEffect {
+    display: none;
+  }
 }
 #results {
   filter: blur(5px);
