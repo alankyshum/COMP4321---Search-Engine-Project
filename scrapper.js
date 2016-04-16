@@ -7,30 +7,30 @@ const model = require('./mod/model');
 // [TODO: Add Database Cleaning so that all crawling test can be done everytime start the server]
 crawl.recursiveExtractLink(config.rootURL, (page) => {
 	model.indexTable.page.upsert(page);
-  
+
 	model.indexTable.word.upsert(Object.keys(page.wordFreqTitle).concat(Object.keys(page.wordFreqBody))).then(() => {
-  
+
     var wordToID = {}, IDToWordFreqTitle = {}, IDToWordFreqBody = {}, IDToWordFreqArray = [];
     model.indexTable.word.getAllID().then((ids) => {
       ids.forEach((element) => { wordToID[element.word] = element._id; });
-      
+
       Object.keys(page.wordFreqTitle).forEach((key) => {
         IDToWordFreqTitle[wordToID[key]] = page.wordFreqTitle[key];
         IDToWordFreqArray.push({wordID: wordToID[key], freq: page.wordFreqTitle[key]});
       });
-      
+
       Object.keys(page.wordFreqBody).forEach((key) => {
         IDToWordFreqBody[wordToID[key]] = page.wordFreqBody[key];
         IDToWordFreqArray.push({wordID: wordToID[key], freq: page.wordFreqBody[key]});
       });
-      
+
       model.indexTable.page.getID(page.url).then((pageID) => {
         model.indexTable.inverted.upsert(IDToWordFreqTitle, IDToWordFreqBody, pageID);
         model.indexTable.forward.upsert(IDToWordFreqArray, pageID);
       });
-    });  
+    });
   });
-  
+
 }, (allPages) => {
 	model.file.cleanFile(config.resultFile);
 	model.file.writeAll(config.resultFile, allPages);

@@ -2,14 +2,14 @@
   "name": "comp4321",
   "version": "1.0.0",
   "description": "NodeJS based search engine built for COMP4321 - HKUST, 2016 Spring",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+git@bitbucket.org:a100438a13/se.git"
+    "url": "git+ssh://git@bitbucket.org/a100438a13/se.git"
   },
   "keywords": [
     "HKUST",
@@ -25,6 +25,7 @@
   "homepage": "https://bitbucket.org/a100438a13/se",
   "dependencies": {
     "cheerio": "^0.20.0",
+    "express": "^4.13.4",
     "follow-redirects": "0.0.7",
     "memory-cache": "^0.1.4",
     "mongoose": "^4.4.10",

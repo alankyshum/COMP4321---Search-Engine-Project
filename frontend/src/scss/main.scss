@@ -8,11 +8,11 @@ $darkGrey: #545454;
 // STYLES -------------------
 // --------------------------
 [data-layer='1'] {
-  z-index: 1;
 }
 #queryForm {
   position: fixed;
   display: flex;
+  z-index: 1;
   width: 100%;
   height: 100%;
   background: transparent;
@@ -40,7 +40,9 @@ $darkGrey: #545454;
   }
 }
 #results {
-  filter: blur(5px);
+  &.typing {
+    filter: blur(5px);
+  }
 }
 
 
