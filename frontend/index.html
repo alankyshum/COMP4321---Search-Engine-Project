@@ -48,7 +48,7 @@
 					var xhttp = new XMLHttpRequest();
 					xhttp.onreadystatechange = () => {
 						if (xhttp.readyState === 4 && xhttp.status === 200)
-							resolve(xhttp.response);
+							resolve(JSON.parse(xhttp.response));
 					}
 					xhttp.open('get', `/query?${buildGetRequest({
 						s: query.DOM.value
@@ -59,7 +59,7 @@
 
 			// RESULT RELATED -----------
 			result.buildDOM = (data) => {
-				console.log(typeof data);
+				console.log(data);
 			}
 
 			// KEY LISTENER -------------
