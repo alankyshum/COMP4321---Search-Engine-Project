@@ -14,17 +14,24 @@ var is = (word) => {
 }
 module.exports.is = is;
 
+// RETURN LIST OF NON-STOPWORD + STEMMED WORDS
+var getSearchables = (wordList) => {
+	return wordList.filter((word) => {
+		return !is(word)
+	}).map((word) => {
+		return stemmer(word).toLowerCase()
+	});
+}
+module.exports.getSearchables = getSearchables;
+
 // RETURN WORD -> FREQUENCY HAS TABLE FROM DOCUMENT BODY
 var wordFreq = (body) => {
 	var wordFreq = {};
 	var wordList = body.match(/\w+/g); // match word
-  
+
   if(wordList==null) return {};  // bug fix: wordList can be null in some pages
-  
-	wordList.filter((word) => {
-		return !is(word)
-	}).map(stemmer).forEach((word) => {
-		word = word.toLowerCase();
+
+	getSearchables(wordList).forEach((word) => {
 		if (!wordFreq[word]) wordFreq[word] = 0;
 		wordFreq[word]++;
 	})

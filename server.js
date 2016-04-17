@@ -4,15 +4,20 @@
  // | _| >  <|  _/   / _|\__ \__ \ \__ \ _||   /\ V /| _||   /
  // |___/_/\_\_| |_|_\___|___/___/ |___/___|_|_\ \_/ |___|_|_\
  //
+const express = require('express')
+  , app = express();
 
-const express = require('express');
-const app = express();
+const search = require('./mod/search')
+  , model = require('./mod/model');
 
 app.use(express.static(`${__dirname}/frontend`));
 app.get('/query', (req, res) => {
-  console.log(req.query);
-  res.setHeader('Content-Type', 'application/json');
-  res.send(req.query);
+  console.log(`[SERVER] GETTING SEARCH RESULTS OF "${req.query.s}"`);
+  search.find(model.words.getSearchables(req.query.s.split(' ')), 10)
+  .then((results) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(results);
+  });
 });
 app.listen('3030', () => {
   console.info(`[SERVER] LISTENING AT PORT 3030`);
