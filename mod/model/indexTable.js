@@ -1,5 +1,6 @@
-const model = require('../model'); // [need review] strange dependency, model <=> indexTable
-const colors = require('colors');
+const model = require('../model') // [need review] strange dependency, model <=> indexTable
+  , colors = require('colors')
+  , error = require('../error');
 /**
  * MODULE:: FORWARD + INVERTED INDEX
  * --------------------------
@@ -15,13 +16,12 @@ module.exports.word = (() => {
 
   returnFx.upsert = (wordList) => {
     var _logHead = "[MODEL/INDEXTABLE/WORD/UPSERT]";
-    
+
     return new Promise((resolve, reject) => {
       var check = 0;
       wordList.forEach((word) => {
         model.dbModel.wordList.collection.update({word: word}, {word: word}, {upsert: true}, (err, docs) => {
-          if(err){ console.log(err); reject(err); }
-
+          error.mongo.parse(err, reject);
           // All Words have been inserted => resolve promise
           if(++check==Object.keys(wordList).length){   // [need review] racing conditions
             console.info(`${_logHead}\tUpserting <${wordList.length} words`.green);
@@ -45,7 +45,7 @@ module.exports.word = (() => {
     return new Promise((resolve, reject) => {
       model.dbModel.wordList.findOne({word: word}, '_id', (err, word) => {
         if (err) {console.error(err); reject(err)}
-        resolve(word._id);
+        if (word) resolve(word._id);
       })
     })
   }
@@ -82,7 +82,9 @@ module.exports.page = (() => {
         url: page.url,
         lastCrawlDate: {$gt: new Date(page.lastCrawlDate.getTime()-1)}
       }, _newPageInfo, {upsert: true}, (err, raw) => {
-        if (err) {console.error(err); reject(err);}
+        if(err){
+          error.mongo.parse(err, reject);
+        }
         else {
           console.info(`${_logHead}\tUpserted URL: ${page.url}`.green);
           resolve();
@@ -129,9 +131,9 @@ module.exports.forward = (() => {
 
   returnFx.upsert = (wordFreqArray, id) => {
     var _logHead = "[MODEL/INDEXTABLE/FORWARD/UPSERT]";
-    
+
     return new Promise((resolve, reject) => {
-      
+
       model.dbModel.forwardTable.update({
         docID: id
       }, {
@@ -144,13 +146,13 @@ module.exports.forward = (() => {
           resolve();
         }
       });
-      
+
     });
   }
 
   returnFx.getDocList = (id) => {
     return new Promise((resolve, reject) => {
-      
+
       model.dbModel.forwardTable.find({docID: id}, 'words', (err, words) => {
         if (err) {console.error(err); reject(err)}
         resolve(words);
@@ -166,18 +168,18 @@ module.exports.forward = (() => {
 // --------------------------
 module.exports.inverted = (() => {
   var returnFx = {};
-  
+
   returnFx.upsert = (wordFreqTitle, wordFreqBody, id) => {
     var check = 0;
-    
+
     return new Promise((resolve, reject) => {
-      
+
       Object.keys(wordFreqTitle).forEach((key) => {
         var _logHead = "[MODEL/INDEXTABLE/INVERTEDTITLE/UPSERT]";
         model.dbModel.invertedTableTitle.update({
           wordID: key,
           "docs.docID": id
-        }, { 
+        }, {
           $set: { "docs.$.freq": wordFreqTitle[key] }
         }, (err, raw) => {
           if (err) {console.error(err); reject(err);}
@@ -195,20 +197,20 @@ module.exports.inverted = (() => {
                 }
               });
             else {
-              //console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreqTitle[key]}]`.green);                  
+              //console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreqTitle[key]}]`.green);
               if(++check==2) resolve();
             }
-          } 
+          }
         });
-        
+
       });
-      
+
       Object.keys(wordFreqBody).forEach((key) => {
         var _logHead = "[MODEL/INDEXTABLE/INVERTEDBODY/UPSERT]";
         model.dbModel.invertedTableBody.update({
           wordID: key,
           "docs.docID": id
-        }, { 
+        }, {
           $set: { "docs.$.freq": wordFreqBody[key] }
         }, (err, raw) => {
           if (err) {console.error(err); reject(err);}
@@ -226,20 +228,33 @@ module.exports.inverted = (() => {
                 }
               });
             else {
-             // console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreqBody[key]}]`.green);                  
+             // console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreqBody[key]}]`.green);
               if(++check==2) resolve();
             }
-          } 
+          }
         });
-        
+
       });
-        
+
     });
   };
-  
-  returnFx.getWordPosting = ((wordID, listNum, limit) => {   // [listNum] 0: Title, 1: Body
+
+  returnFx.getWordPosting = ((wordID, findTitle, limit) => {   // [listNum] true: Title, false: Body
     var query = typeof limit===undefined?{wordID: wordID}:{wordID: wordID, docs: {$slice: limit} };  // default parameter (limit)
-    model.dbModel.invertedTable.find(query, 'docs', (err, postings) => {
+    model.dbModel[findTitle?invertedTableTitle:invertedTableBody].find(query , 'docs', (err, postings) => {
+      if (err) {console.error(err); reject(err)}
+      resolve(postings);
+    });
+  });
+
+  returnFx.getWordPostings = ((wordIDList, findTitle, limit) => {   // [listNum] true: Title, false: Body
+    console.log(wordIDList);
+    // console.log(typeof mongoose.Types.ObjectId(SwordIDList[0]));
+    model.dbModelmodel.dbModel[findTitle?invertedTableTitle:invertedTableBody].find({
+      wordID: wordIDList[0]
+      // wordID: {$in: wordIDList}
+    }, 'docs', (err, postings) => {
+      console.log("DONE SEARCHING DOCUMENTS");
       if (err) {console.error(err); reject(err)}
       resolve(postings);
     });
