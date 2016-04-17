@@ -50,6 +50,21 @@ module.exports.word = (() => {
     })
   }
 
+  returnFx.getIDs = (wordList) => {
+    return new Promise((resolve, reject) => {
+      model.dbModel.wordList.find({word: {$in: wordList}}, '_id', (err, words) => {
+        if (err) {console.error(err); reject(err)}
+        var wordIDList = null;
+        if (words) {
+          wordIDList = words.map((word) => {
+            return word._id
+          });
+        }
+        resolve(wordIDList);
+      })
+    })
+  }
+
   returnFx.getWord = (id) => {
     return new Promise((resolve, reject) => {
       model.dbModel.wordList.findById(id, (err, word) => {
