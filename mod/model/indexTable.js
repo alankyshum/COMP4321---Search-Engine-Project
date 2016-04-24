@@ -21,9 +21,9 @@ module.exports.word = (() => {
       var check = 0;
       wordList.forEach((word) => {
         model.dbModel.wordList.collection.update({word: word}, {word: word}, {upsert: true}, (err, docs) => {
-          error.mongo.parse(err, reject);
+          if (err) error.mongo.parse(err, reject)
           // All Words have been inserted => resolve promise
-          if(++check==Object.keys(wordList).length){   // [need review] racing conditions
+          if(++check==Object.keys(wordList).length) {   // [need review] racing conditions
             console.info(`${_logHead}\tUpserting <${wordList.length} words`.green);
             resolve();
           }
@@ -97,9 +97,8 @@ module.exports.page = (() => {
         url: page.url,
         lastCrawlDate: {$gt: new Date(page.lastCrawlDate.getTime()-1)}
       }, _newPageInfo, {upsert: true}, (err, raw) => {
-        if(err){
+        if(err)
           error.mongo.parse(err, reject);
-        }
         else {
           console.info(`${_logHead}\tUpserted URL: ${page.url}`.green);
           resolve();
@@ -255,23 +254,25 @@ module.exports.inverted = (() => {
   };
 
   returnFx.getWordPosting = ((wordID, findTitle, limit) => {   // [listNum] true: Title, false: Body
-    var query = typeof limit===undefined?{wordID: wordID}:{wordID: wordID, docs: {$slice: limit} };  // default parameter (limit)
-    model.dbModel[findTitle?invertedTableTitle:invertedTableBody].find(query , 'docs', (err, postings) => {
-      if (err) {console.error(err); reject(err)}
-      resolve(postings);
-    });
+    // default parameter (limit)
+    var query = typeof limit===undefined?{wordID: wordID}:{wordID: wordID, docs: {$slice: limit} };
+    return new Promise((resolve, reject) => {
+      model.dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find(query , 'docs', (err, postings) => {
+        if (err) {console.error(err); reject(err)}
+        resolve(postings);
+      });
+    })
   });
 
   returnFx.getWordPostings = ((wordIDList, findTitle, limit) => {   // [listNum] true: Title, false: Body
-    console.log(wordIDList);
-    // console.log(typeof mongoose.Types.ObjectId(SwordIDList[0]));
-    model.dbModelmodel.dbModel[findTitle?invertedTableTitle:invertedTableBody].find({
-      wordID: wordIDList[0]
-      // wordID: {$in: wordIDList}
-    }, 'docs', (err, postings) => {
-      console.log("DONE SEARCHING DOCUMENTS");
-      if (err) {console.error(err); reject(err)}
-      resolve(postings);
+    return new Promise((resolve, reject) => {
+      model.dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find({
+        wordID: {$in: wordIDList}
+      }, 'docs', (err, postings) => {
+        console.log("DONE SEARCHING DOCUMENTS");
+        if (err) {console.error(err); reject(err)}
+        resolve(postings);
+      });
     });
   });
 
