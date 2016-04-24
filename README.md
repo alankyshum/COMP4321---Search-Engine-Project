@@ -1,15 +1,15 @@
 # COMP4321 - Search Engine
 
 ## Proress - Phase 1
-- [ ] Implement a spider
-	- [ ] Crawler
-	- [ ] Index (30 pages from http://www.cse.ust.hk)
-- [ ] Implement a test program which read data from the database
-	- [ ] Outputs a plain-text file named `spider_result.txt`
-- [ ] All supporting databases should be defined
-	- [ ] Forward and inverted indexes
-	- [ ] Mapping tables for URL <=> page ID
-	- [ ] Word <=> word ID
+- [X] Implement a spider
+	- [X] Crawler
+	- [X] Index (30 pages from http://www.cse.ust.hk)
+- [X] Implement a test program which read data from the database
+	- [X] Outputs a plain-text file named `spider_result.txt`
+- [X] All supporting databases should be defined
+	- [X] Forward and inverted indexes
+	- [X] Mapping tables for URL <=> page ID
+	- [X] Word <=> word ID
 
 ### Format of `spider_result.txt`
 ```plain-text
@@ -26,13 +26,19 @@ Child Link2 .....
 | Name | Email | Student ID |
 | --- | --- | --- |
 | Alan Shum | kyshum@ust.hk | 20110916 |
-| Ivan Fung | placeholder | placeholder |
+| Ivan Fung | hlfungaa@connect.ust.hk | 20115291 |
 
 ## To start
-1. Install `Node.JS`, `npm`
+1. Install `Node.JS`, `npm`, `MongoDB`
 1. `cd <path to this project, root>`
 1. `npm install`
-1. `node scrapper.js`
+1. `npm start`
+
+## Wordarounds
+| Issue | Workaround |
+| --- | --- |
+| content-length (page-size) | length of response text from `http request` |
+| last modified date |  |
+
 
 ## CREDITS
-1. [X-Ray](https://github.com/lapwinglabs/x-ray) - Scrapper used in this project

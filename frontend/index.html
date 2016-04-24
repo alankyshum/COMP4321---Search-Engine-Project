@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>COMP4321 - Search Engine</title>
+		<link rel="stylesheet" href="css/main.css" media="screen" title="Main CSS" charset="utf-8">
+	</head>
+	<body>
+		<form id='queryForm' data-layer='1'>
+			<input id='query' type="text" autocomplete="off" autofocus>
+			<audio id='soundEffect' controls='false' preload>
+				<source src="assets/submitQuery.mp3" type="audio/mpeg">
+			</audio>
+		</form>
+		<div id="results">
+		</div>
+
+		<script>
+			// ----------------
+			// GLOBAL VARAIBLES
+			// ----------------
+			var query = {
+				DOM: document.getElementById('query'),
+				formDOM: document.getElementById('queryForm'),
+				sound: document.getElementById('soundEffect')
+			};
+			var result = {
+				DOM: document.getElementById('results')
+			}
+
+			// -------------------
+			// HELPER FUNCTIONS
+			// -------------------
+			var buildGetRequest = (JSONReq) => {
+				return Object.keys(JSONReq).map((key) => {
+					return `${encodeURIComponent(key)}=${encodeURIComponent(JSONReq[key])}`;
+				}).join('&');
+			}
+
+			// --------------
+			// CORE FUNCTIONS
+			// --------------
+
+			// FORM RELATED -----------
+			query.formDOM.onsubmit = (e) => {e.preventDefault();}
+			query.submit = () => {
+				return new Promise((resolve, reject) => {
+					var xhttp = new XMLHttpRequest();
+					xhttp.onreadystatechange = () => {
+						if (xhttp.readyState === 4 && xhttp.status === 200)
+							resolve(JSON.parse(xhttp.response));
+					}
+					xhttp.open('get', `/query?${buildGetRequest({
+						s: query.DOM.value
+					})}`, true);
+					xhttp.send();
+				});
+			}
+
+			// RESULT RELATED -----------
+			result.buildDOM = (data) => {
+				console.log(data);
+			}
+
+			// KEY LISTENER -------------
+			document.onkeypress = (e) => {
+				query.DOM.focus();
+				result.DOM.classList.add('typing');
+				if (e.keyCode === 13) {
+					// animate input box
+					query.DOM.classList.add('shrinkToLoadingBar');
+					query.sound.play();
+					// submit form
+					query.submit()
+					.then((data) => {
+						result.buildDOM(data);
+						query.DOM.classList.remove('shrinkToLoadingBar');
+						result.DOM.classList.remove('typing');
+					});
+				}
+			}
+		</script>
+	</body>
+</html>
