@@ -127,13 +127,27 @@ module.exports.page = (() => {
 
   returnFx.getPage = (id, fields) => {
     return new Promise((resolve, reject) => {
-      fields = fields?fields:"";
-      model.dbModel.pageInfo.findById(id, fields, (err, page) => {
+      var _fieldsQuery = fields?fields.join(' '):"";
+      model.dbModel.pageInfo.findById(id, _fieldsQuery, (err, page) => {
         if (err) {console.error(err); reject(err)}
         if (!page) return resolve(null);
         if (fields && fields.length === 1) resolve(page[fields[0]])
         else resolve(page);
-        console.log(page);
+      })
+    })
+  }
+
+
+  returnFx.getPages = (idList, fields) => {
+    return new Promise((resolve, reject) => {
+      var _fieldsQuery = fields?fields.join(' '):"";
+      model.dbModel.pageInfo.find({_id: {$in: idList}}, _fieldsQuery, (err, pages) => {
+        if (err) {console.error(err); reject(err)}
+        if (!pages) return resolve(null);
+        if (fields && fields.length === 1) resolve(pages.map((page) => {
+          return page[fields[0]]
+        }));
+        else resolve(pages);
       })
     })
   }
