@@ -1,15 +1,36 @@
 # COMP4321 - Search Engine
 
 ## Proress - Phase 1
-- [X] Implement a spider
-	- [X] Crawler
-	- [X] Index (30 pages from http://www.cse.ust.hk)
-- [X] Implement a test program which read data from the database
-	- [X] Outputs a plain-text file named `spider_result.txt`
-- [X] All supporting databases should be defined
-	- [X] Forward and inverted indexes
-	- [X] Mapping tables for URL <=> page ID
-	- [X] Word <=> word ID
+- [x] Implement a spider
+	- [x] Crawler
+	- [x] Index (30 pages from http://www.cse.ust.hk)
+- [x] Implement a test program which read data from the database
+	- [x] Outputs a plain-text file named `spider_result.txt`
+- [x] All supporting databases should be defined
+	- [x] Forward and inverted indexes
+	- [x] Mapping tables for URL <=> page ID
+	- [x] Word <=> word ID
+
+## Progress - Final Phase
+
+It worths 20% of the course marks.
+- [x] User inputs queries the search engine through the web interface
+- [ ] Returns the top documents to the user through the web interface
+- [ ] Index 300 pages starting from http://www.cse.ust.hk/~ericzhao/COMP4321/TestPages/testpage.htm
+- [ ] Submission: `spider`, `indexer`, `search engine`, `web interface` (NO `DB`)
+	- [ ] To CASS system `FinalPhase.zip`
+- [ ] Documentation (8-10 pages)
+	- [ ] Overall design of the system
+	- [ ] The file structures used in the index database
+	- [ ] Algorithms used (including the mechanism for favoring title matches)
+	- [ ] Installation procedure (it could be as simple as “Type make in the project directory”)
+	- [ ] Highlight of features beyond the required specification
+	- [ ] Testing of the functions implemented; (e.g.) screenshots
+	- [ ] Conclusion:
+		- [ ] Strengths + Weaknesses of your systems;
+		- [ ] Self-reflection;
+		- [ ] Future Development
+		- [ ] Distribution of work
 
 ### Format of `spider_result.txt`
 ```plain-text
@@ -32,13 +53,11 @@ Child Link2 .....
 1. Install `Node.JS`, `npm`, `MongoDB`
 1. `cd <path to this project, root>`
 1. `npm install`
-1. `npm start`
+1. `node spider`: Start the spider to crawl web pages
+1. `node server`: Start the server of the search engine
 
-## Wordarounds
+## Workarounds
 | Issue | Workaround |
 | --- | --- |
 | content-length (page-size) | length of response text from `http request` |
-| last modified date |  |
-
-
-## CREDITS
+| last modified date | Used current date, as suggested from the course website |
