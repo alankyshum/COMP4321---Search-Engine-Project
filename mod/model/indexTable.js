@@ -125,11 +125,15 @@ module.exports.page = (() => {
     })
   }
 
-  returnFx.getURL = (id) => {
+  returnFx.getPage = (id, fields) => {
     return new Promise((resolve, reject) => {
-      model.dbModel.pageInfo.findById(id, (err, page) => {
+      fields = fields?fields:"";
+      model.dbModel.pageInfo.findById(id, fields, (err, page) => {
         if (err) {console.error(err); reject(err)}
-        resolve(page.url);
+        if (!page) return resolve(null);
+        if (fields && fields.length === 1) resolve(page[fields[0]])
+        else resolve(page);
+        console.log(page);
       })
     })
   }
