@@ -123,10 +123,10 @@ module.exports.page = (() => {
       }) // end: forEach
       bulk.execute((err, result) => {
         if (err)
-          error.mongo.parse(err, reject);
+          error.mongo.parse(err, reject, resolve);
         else {
           console.info(`${_logHead}\tUpserted ${pages.length} URLs`.green);
-          return resolve();
+          resolve();
         }
       })
     })
