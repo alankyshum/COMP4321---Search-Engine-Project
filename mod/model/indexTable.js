@@ -16,18 +16,18 @@ module.exports.word = (() => {
 
   returnFx.upsert = (wordList) => {
     var _logHead = "[MODEL/INDEXTABLE/WORD/UPSERT]";
-
     return new Promise((resolve, reject) => {
-      var check = 0;
+      var bulk = model.dbModel.wordList.collection.initializeUnorderedBulkOp();
       wordList.forEach((word) => {
-        model.dbModel.wordList.collection.update({word: word}, {word: word}, {upsert: true}, (err, docs) => {
-          if (err) error.mongo.parse(err, reject)
-          // All Words have been inserted => resolve promise
-          if(++check==Object.keys(wordList).length) {   // [need review] racing conditions
-            console.info(`${_logHead}\tUpserting <${wordList.length} words`.green);
-            resolve(wordList);
-          }
-        });
+        bulk.find({word: word}).upsert().updateOne({word: word});
+      });
+      bulk.execute((err, result) => {
+        if(err)
+          error.mongo.parse(err, reject);
+        else {
+          console.info(`${_logHead} BULK INSERTION OF ${wordList.length} WORDS DONE`.green);
+          return resolve(wordList);
+        }
       });
     });
   }
@@ -121,6 +121,17 @@ module.exports.page = (() => {
       model.dbModel.pageInfo.findOne({url: url}, '_id', (err, url) => {
         if (err) {console.error(err); reject(err)}
         resolve(url._id);
+      })
+    })
+  }
+
+  returnFx.getIDs = (urlList) => {
+    return new Promise((resolve, reject) => {
+      model.dbModel.pageInfo.find({url: {$in: urlList}}, '_id', (err, urls) => {
+        if (err) {console.error(err); reject(err)}
+        resolve(urls.map((url) => {
+          return url.id
+        }));
       })
     })
   }
