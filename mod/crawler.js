@@ -9,6 +9,7 @@ const https = require('follow-redirects').https;
 const cheerio = require('cheerio');
 const StringDecoder = require('string_decoder').StringDecoder;
 const model = require('./model');
+const url = require('url');
 
 // EXTRACT ALL LINKS ON A PAGE
 module.exports.extractLinks = (link) => {
@@ -28,7 +29,10 @@ module.exports.extractLinks = (link) => {
 
       res.on('end', () => {
         var $ = cheerio.load(decoder.write(data));
-				$('a[href]').each((a_i, a) => { linkSet.add((($(a).attr('href').match(/http[s]?:\/\//)?"":link)+$(a).attr('href')).replace(/([^:])\/\//, '$1/').replace(/\/+$/, '')); });
+				$('a[href]').each((a_i, a) => {
+					console.log(link);
+					linkSet.add(url.resolve(link, $(a).attr('href')));
+			 	});
         resolve({
 					title: $('title').text() || "",
 					url: link.replace(/\/+$/, ''),
@@ -41,7 +45,7 @@ module.exports.extractLinks = (link) => {
           wordFreq: $('body, title').text()?model.words.wordFreq($('body, title').text()):{}
 				});
       });
-		
+
     }).on('error', (err) => {
 			reject(err);
 		});
