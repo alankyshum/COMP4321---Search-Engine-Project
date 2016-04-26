@@ -25,7 +25,7 @@ module.exports.word = (() => {
           // All Words have been inserted => resolve promise
           if(++check==Object.keys(wordList).length) {   // [need review] racing conditions
             console.info(`${_logHead}\tUpserting <${wordList.length} words`.green);
-            resolve();
+            resolve(wordList);
           }
         });
       });

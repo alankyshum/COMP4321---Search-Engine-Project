@@ -8,10 +8,11 @@ const model = require('./mod/model');
 crawl.recursiveExtractLink(config.rootURL, (page) => {
 	model.indexTable.page.upsert(page);
 
-	model.indexTable.word.upsert(Object.keys(page.wordFreqTitle).concat(Object.keys(page.wordFreqBody))).then(() => {
+	model.indexTable.word.upsert(Object.keys(page.wordFreqTitle).concat(Object.keys(page.wordFreqBody)))
+	.then((wordList) => {
 
     var wordToID = {}, IDToWordFreqTitle = {}, IDToWordFreqBody = {}, IDToWordFreqArray = [];
-    model.indexTable.word.getAllID().then((ids) => {
+    model.indexTable.word.getIDs(wordList).then((ids) => {
       ids.forEach((element) => { wordToID[element.word] = element._id; });
 
       Object.keys(page.wordFreqTitle).forEach((key) => {
@@ -29,9 +30,11 @@ crawl.recursiveExtractLink(config.rootURL, (page) => {
         model.indexTable.forward.upsert(IDToWordFreqArray, pageID);
       });
     });
+
   });
 
 }, (allPages) => {
+	// TODO: update childIDs from childLinks
 	model.file.cleanFile(config.resultFile);
 	model.file.writeAll(config.resultFile, allPages);
 });
