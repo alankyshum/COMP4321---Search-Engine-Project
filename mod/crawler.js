@@ -23,14 +23,12 @@ module.exports.extractLinks = (link) => {
       var data = "";
 
 			res.on('data', (chunk) => {
-				console.log(`[debug] ${link}`);   // bug fix, multiple chunks for one website
         data += chunk;
 			});
 
       res.on('end', () => {
         var $ = cheerio.load(decoder.write(data));
 				$('a[href]').each((a_i, a) => {
-					console.log(link);
 					linkSet.add(url.resolve(link, $(a).attr('href')));
 			 	});
         resolve({
@@ -66,21 +64,21 @@ module.exports.recursiveExtractLink = (link, middleCB, finalCB) => {
 
   var crawlChild = () => {
     while(_queue.length&&crawledLinks[_queue[0]]==true) _queue.shift();   // BFS + Eliminate Cycles
-    if(_queue.length&&numCrawled<config.maxPages)
-        module.exports.extractLinks(_queue[0]).then((page) => {
-          numCrawled++;
-          crawledLinks[_queue[0]]=true;
-          _queue.shift();
-          allPages.push(page);
-          page.childLinks.forEach((link) => { _queue.push(link); });
+    if(_queue.length && numCrawled < config.maxPages)
+      module.exports.extractLinks(_queue[0]).then((page) => {
+        numCrawled++;
+        crawledLinks[_queue[0]]=true;
+        _queue.shift();
+        allPages.push(page);
+        page.childLinks.forEach((link) => { _queue.push(link); });
 
-          // Callback
-          middleCB(page);
+        // Callback
+        middleCB(page);
 
-          // recursively call
-          crawlChild();
-        });
-    else if(numCrawled<config.maxPages)
+        // recursively call
+        crawlChild();
+      });
+    else if(numCrawled < config.maxPages)
       console.log(`[Error] Cannot retrieve enough pages - current: ${numCrawled}, target: ${config.maxPages}`);
     else finalCB(allPages);
   }

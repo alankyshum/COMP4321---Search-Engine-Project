@@ -107,6 +107,31 @@ module.exports.page = (() => {
     }) // end:: Promise
   }
 
+  returnFx.upsertBulk = (pages) => {
+    var _logHead = "[MODEL/INDEXTABLE/PAGE/UPSERT-BULK]";
+    return new Promise((resolve, reject) => {
+      var bulk = model.dbModel.pageInfo.collection.initializeUnorderedBulkOp();
+      pages.forEach((page) => {
+        bulk.find({url: page.url}).upsert().updateOne({
+          title: page.title,
+          url: page.url,
+          lastModifiedDate: page.lastModifiedDate,
+          lastCrawlDate: page.lastCrawlDate,
+          size: page.pageSize,
+          childLinks: page.childLinks
+        });
+      }) // end: forEach
+      bulk.execute((err, result) => {
+        if (err)
+          error.mongo.parse(err, reject);
+        else {
+          console.info(`${_logHead}\tUpserted ${pages.length} URLs`.green);
+          return resolve();
+        }
+      })
+    })
+  }
+
   returnFx.getAllID = () => {
     return new Promise((resolve, reject) => {
       model.dbModel.pageInfo.find(null, '_id url', (err, pages) => {
