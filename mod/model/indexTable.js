@@ -218,6 +218,34 @@ module.exports.forward = (() => {
     });
   }
 
+
+  returnFx.upsertBulk = (wordFreqArray, idList) => {
+    var _logHead = "[MODEL/INDEXTABLE/FORWARD/UPSERT]";
+
+    return new Promise((resolve, reject) => {
+
+      var bulk = model.dbModel.forwardTable.collection.initializeUnorderedBulkOp();
+      idList.forEach((id) => {
+        bulk.find({docID: id}).upsert().updateOne({
+          docID: id,
+          $addToSet: {words: {$each: wordFreqArray}}
+        })
+      });
+
+      bulk.execute((err, result) => {
+        if (err) {
+          error.mongo.parse(err, reject, resolve)
+        } else {
+          console.info(`${_logHead}\tUpserted Forward List: ${id.length} ids`.green);
+          resolve();
+        }
+      });
+
+    }); // end:: promise
+  }
+
+
+
   returnFx.getDocList = (id) => {
     return new Promise((resolve, reject) => {
 

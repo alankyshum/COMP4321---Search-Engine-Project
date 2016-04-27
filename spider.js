@@ -1,6 +1,7 @@
 const config = require('./config.json');
 const crawl = require('./mod/crawler');
 const model = require('./mod/model');
+const colors = require('colors');
 
 
 // [TODO: Batch update/insert - Not using batch is too slow, reason: over network => please abandon mongolab in production release]
@@ -27,6 +28,7 @@ var bulkOps = () => {
 		.then((wordList) => {
 			var wordToID = {}, IDToWordFreqTitle = {}, IDToWordFreqBody = {}, IDToWordFreqArray = [];
 			model.indexTable.word.getIDs(wordList).then((ids) => {
+
 				ids.forEach((element) => { wordToID[element.word] = element._id; });
 
 				var _urlList = [];
@@ -43,18 +45,22 @@ var bulkOps = () => {
 				}); // end:: loop page --> prepare wordFreqTable
 
 				model.indexTable.page.getIDs(_urlList).then((idList) => {
-					console.log(idList.length);
-					// model.indexTable.inverted.upsertBulk(IDToWordFreqTitle, IDToWordFreqBody, idList);
-					// model.indexTable.forward.upsertBulk(IDToWordFreqArray, idList);
+					var _upsertPromise = [
+						// model.indexTable.inverted.upsertBulk(IDToWordFreqTitle, IDToWordFreqBody, idList),
+						model.indexTable.forward.upsertBulk(IDToWordFreqArray, idList)
+					];
+					return Promise.all(_upsertPromise);
 				}); // end:: finished forward table + inverted table buildup
 
-				// CLEAR CACHE
-				objectCache.pageCache = [];
-				objectCache.wordCache = [];
-
 			}); // end:: loop word
-		});
-	}); // end:: after adding pages, ids are ready
+		}); // end:: upsert word
+	}) // end:: after adding pages, ids are ready
+	.then(() => {
+		// CLEAR CACHE
+		console.log("CLEAR CACHE ...".red);
+		objectCache.pageCache = [];
+		objectCache.wordCache = [];
+	})
 }
 
 // CORE FUNCTIONS
