@@ -50,17 +50,20 @@ module.exports.word = (() => {
     })
   }
 
+  returnFx.getWordID = (wordList) => {
+    return new Promise((resolve, reject) => {
+      model.dbModel.wordList.find({word: {$in: wordList}}, (err, words) => {
+        if (err) {console.error(err); reject(err)}
+        resolve(words);
+      })
+    })
+  }
+
   returnFx.getIDs = (wordList) => {
     return new Promise((resolve, reject) => {
       model.dbModel.wordList.find({word: {$in: wordList}}, '_id', (err, words) => {
         if (err) {console.error(err); reject(err)}
-        var wordIDList = null;
-        if (words) {
-          wordIDList = words.map((word) => {
-            return word._id
-          });
-        }
-        resolve(wordIDList);
+        resolve(words);
       })
     })
   }
@@ -221,7 +224,6 @@ module.exports.forward = (() => {
 
   returnFx.upsertBulk = (wordFreqArray, idList) => {
     var _logHead = "[MODEL/INDEXTABLE/FORWARD/UPSERT]";
-
     return new Promise((resolve, reject) => {
 
       var bulk = model.dbModel.forwardTable.collection.initializeUnorderedBulkOp();
@@ -243,7 +245,6 @@ module.exports.forward = (() => {
 
     }); // end:: promise
   }
-
 
 
   returnFx.getDocList = (id) => {
@@ -269,6 +270,81 @@ module.exports.inverted = (() => {
     var check = 0;
 
     return new Promise((resolve, reject) => {
+
+      Object.keys(wordFreqTitle).forEach((key) => {
+        var _logHead = "[MODEL/INDEXTABLE/INVERTEDTITLE/UPSERT]";
+        model.dbModel.invertedTableTitle.update({
+          wordID: key,
+          "docs.docID": id
+        }, {
+          $set: { "docs.$.freq": wordFreqTitle[key] }
+        }, (err, raw) => {
+          if (err) {console.error(err); reject(err);}
+          else {
+            if(!raw.nMatched)
+              model.dbModel.invertedTableTitle.update({
+                wordID: key
+              }, {
+                $addToSet: { docs: { docID: id, freq: wordFreqTitle[key]} }
+              }, {upsert: true}, (err, raw) => {
+                if (err) {console.error(err); reject(err);}
+                else {
+                  //console.info(`${_logHead}\tInserted posting for Word[${key}]: Page[${id}] - Freq[${wordFreqTitle[key]}]`.green);
+                  if(++check==2) resolve();
+                }
+              });
+            else {
+              //console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreqTitle[key]}]`.green);
+              if(++check==2) resolve();
+            }
+          }
+        });
+
+      });
+
+      Object.keys(wordFreqBody).forEach((key) => {
+        var _logHead = "[MODEL/INDEXTABLE/INVERTEDBODY/UPSERT]";
+        model.dbModel.invertedTableBody.update({
+          wordID: key,
+          "docs.docID": id
+        }, {
+          $set: { "docs.$.freq": wordFreqBody[key] }
+        }, (err, raw) => {
+          if (err) {console.error(err); reject(err);}
+          else {
+            if(!raw.nMatched)
+              model.dbModel.invertedTableBody.update({
+                wordID: key
+              }, {
+                $addToSet: { docs: { docID: id, freq: wordFreqBody[key]} }
+              }, {upsert: true}, (err, raw) => {
+                if (err) {console.error(err); reject(err);}
+                else {
+                  //console.info(`${_logHead}\tInserted posting for Word[${key}]: Page[${id}] - Freq[${wordFreqBody[key]}]`.green);
+                  if(++check==2) resolve();
+                }
+              });
+            else {
+             // console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreqBody[key]}]`.green);
+              if(++check==2) resolve();
+            }
+          }
+        });
+
+      });
+
+    });
+  };
+
+  returnFx.upsertBulk = (wordFreqTitle, wordFreqBody, idList) => {
+    var check = 0;
+
+    return new Promise((resolve, reject) => {
+
+      var bulk = model.dbModel.invertedTableTitle.collection.initializeUnorderedBulkOp();
+      idList.forEach((id) => {
+
+      })
 
       Object.keys(wordFreqTitle).forEach((key) => {
         var _logHead = "[MODEL/INDEXTABLE/INVERTEDTITLE/UPSERT]";

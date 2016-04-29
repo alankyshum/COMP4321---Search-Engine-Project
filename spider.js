@@ -24,49 +24,61 @@ var writeCnt = cnt(1);
 var bulkOps = () => {
 	model.indexTable.page.upsertBulk(objectCache.pageCache)
 	.then(() => {
-		model.indexTable.word.upsert(objectCache.wordCache)
-		.then((wordList) => {
-			var wordToID = {}, IDToWordFreqTitle = {}, IDToWordFreqBody = {}, IDToWordFreqArray = [];
-			model.indexTable.word.getIDs(wordList).then((ids) => {
-
-				ids.forEach((element) => { wordToID[element.word] = element._id; });
-
-				var _urlList = [];
-				objectCache.pageCache.forEach((page) => {
-					_urlList.push(page.url)
-					Object.keys(page.wordFreqTitle).forEach((key) => {
-						IDToWordFreqTitle[wordToID[key]] = page.wordFreqTitle[key];
-						IDToWordFreqArray.push({wordID: wordToID[key], freq: page.wordFreqTitle[key]});
-					});
-					Object.keys(page.wordFreqBody).forEach((key) => {
-						IDToWordFreqBody[wordToID[key]] = page.wordFreqBody[key];
-						IDToWordFreqArray.push({wordID: wordToID[key], freq: page.wordFreqBody[key]});
-					});
-				}); // end:: loop page --> prepare wordFreqTable
-
-				model.indexTable.page.getIDs(_urlList).then((idList) => {
-					var _upsertPromise = [
-						// model.indexTable.inverted.upsertBulk(IDToWordFreqTitle, IDToWordFreqBody, idList),
-						model.indexTable.forward.upsertBulk(IDToWordFreqArray, idList)
-					];
-					return Promise.all(_upsertPromise);
-				}); // end:: finished forward table + inverted table buildup
-
-			}); // end:: loop word
-		}); // end:: upsert word
-	}) // end:: after adding pages, ids are ready
-	.then(() => {
-		// CLEAR CACHE
-		console.log("CLEAR CACHE ...".red);
-		objectCache.pageCache = [];
-		objectCache.wordCache = [];
+		return model.indexTable.word.upsert(objectCache.wordCache)
 	})
+	.then((wordList) => {
+		return model.indexTable.word.getWordID(wordList)
+	})
+	.then((ids) => {
+		var wordToID = {}, IDToWordFreqTitle = {}, IDToWordFreqBody = {}, IDToWordFreqArray = [];
+		ids.forEach((element) => { wordToID[element.word] = element._id; });
+		var _urlList = [];
+		objectCache.pageCache.forEach((page) => {
+			_urlList.push(page.url)
+			Object.keys(page.wordFreqTitle).forEach((key) => {
+				IDToWordFreqTitle[wordToID[key]] = page.wordFreqTitle[key];
+				IDToWordFreqArray.push({wordID: wordToID[key], freq: page.wordFreqTitle[key]});
+			});
+			Object.keys(page.wordFreqBody).forEach((key) => {
+				IDToWordFreqBody[wordToID[key]] = page.wordFreqBody[key];
+				IDToWordFreqArray.push({wordID: wordToID[key], freq: page.wordFreqBody[key]});
+			});
+		}); // end:: loop page --> prepare wordFreqTable
+		return Promise.all([
+			model.indexTable.page.getIDs(_urlList),
+			new Promise((resolve, reject) => {
+				resolve({
+					IDToWordFreqArray: IDToWordFreqArray,
+					IDToWordFreqTitle: IDToWordFreqTitle,
+					IDToWordFreqBody: IDToWordFreqBody
+				})
+			})
+		]);
+	})
+	.then((docID_wordID) => {
+		// TODO: Implement bulk upsert function for subarray
+		try {
+			var _upsertPromise = [
+				// model.indexTable.inverted.upsertBulk(docID_wordID[1].IDToWordFreqTitle, docID_wordID[1].IDToWordFreqBody, docID_wordID[0]),
+				model.indexTable.forward.upsertBulk(docID_wordID[1].IDToWordFreqArray, docID_wordID[0])
+			];
+		} catch (e) {
+			console.log(e);
+		}
+		// return Promise.all(_upsertPromise);
+	})
+	// .then(() => {
+	// 	// CLEAR CACHE
+	// 	console.log("CLEAR CACHE ...".red);
+	// 	objectCache.pageCache = [];
+	// 	objectCache.wordCache = [];
+	// })
 }
 
 // CORE FUNCTIONS
 // --------------
 crawl.recursiveExtractLink(config.rootURL, (page) => {
-	console.info(`[${writeCnt.next().value}] ${page.title}`);
+	// console.info(`[${writeCnt.next().value}] ${page.title}`);
 
 	objectCache.pageCache.push(page);
 	objectCache.wordCache = objectCache.wordCache.concat(Object.keys(page.wordFreqTitle).concat(Object.keys(page.wordFreqBody)));
