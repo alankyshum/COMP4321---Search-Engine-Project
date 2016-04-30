@@ -16,17 +16,17 @@ module.exports.word = (() => {
   var returnFx = {};
 
   returnFx.upsert = (wordList) => {
-    var _logHead = "[MODEL/INDEXTABLE/WORD/UPSERT]";
+    var _logHead = "[MODEL/INDEXTABLE/WORD/UPSERT-BULK]";
     return new Promise((resolve, reject) => {
       var bulk = model.dbModel.wordList.collection.initializeUnorderedBulkOp();
       wordList.forEach((word) => {
         bulk.find({word: word}).upsert().updateOne({word: word});
       });
-      bulk.execute((err, result) => {
+      bulk.execute((err, results) => {
         if(err)
           error.mongo.parse(err, reject);
         else {
-          console.info(`${_logHead} BULK INSERTION OF ${wordList.length} WORDS DONE`.green);
+          console.info(`${_logHead}\tModified ${results.nModified}`.green);
           return resolve(wordList);
         }
       });
@@ -131,7 +131,7 @@ module.exports.page = (() => {
         if (err)
           error.mongo.parse(err, reject, resolve);
         else {
-          console.info(`${_logHead}\tUpserted ${result.nUpserted} URLs`.green);
+          console.info(`${_logHead}\tModified ${result.nModified}`.green);
           resolve();
         }
       })
@@ -235,7 +235,7 @@ module.exports.forward = (() => {
 
 
   returnFx.upsertBulk = (pageWordTable) => {
-    var _logHead = "[MODEL/INDEXTABLE/FORWARD/UPSERT]";
+    var _logHead = "[MODEL/INDEXTABLE/FORWARD/UPSERT-BULK]";
     return new Promise((resolve, reject) => {
       var bulk = model.dbModel.forwardTable.collection.initializeUnorderedBulkOp();
       try {
@@ -348,88 +348,58 @@ module.exports.inverted = (() => {
     });
   };
 
-  returnFx.upsertBulk = (wordFreqTitle, wordFreqBody, idList) => {
-    var check = 0;
+  returnFx.upsertBulk = (pageWordTable) => {
+    var bulk_title = model.dbModel.invertedTableTitle.collection.initializeUnorderedBulkOp()
+      , bulk_body = model.dbModel.invertedTableBody.collection.initializeUnorderedBulkOp();
 
-    return new Promise((resolve, reject) => {
-
-      var bulk = model.dbModel.invertedTableTitle.collection.initializeUnorderedBulkOp();
-      idList.forEach((id) => {
-        bulk.find({
+    Object.keys(pageWordTable).forEach((id) => {
+      Object.keys(pageWordTable[id].IDToWordFreqTitle).forEach((key) => {
+        bulk_title.find({
           wordID: key
         }).upsert().updateOne({
           "$addToSet": {
             docs: {
               docID: id,
-              freq: wordFreqTitle[key]
+              freq: pageWordTable[id].IDToWordFreqTitle[key]
             }
           }
         })
       })
-
-      Object.keys(wordFreqTitle).forEach((key) => {
-        var _logHead = "[MODEL/INDEXTABLE/INVERTEDTITLE/UPSERT]";
-        model.dbModel.invertedTableTitle.update({
-          wordID: key,
-          "docs.docID": id
-        }, {
-          $set: { "docs.$.freq": wordFreqTitle[key] }
-        }, (err, raw) => {
-          if (err) {console.error(err); reject(err);}
-          else {
-            if(!raw.nMatched)
-              model.dbModel.invertedTableTitle.update({
-                wordID: key
-              }, {
-                $addToSet: { docs: { docID: id, freq: wordFreqTitle[key]} }
-              }, {upsert: true}, (err, raw) => {
-                if (err) {console.error(err); reject(err);}
-                else {
-                  //console.info(`${_logHead}\tInserted posting for Word[${key}]: Page[${id}] - Freq[${wordFreqTitle[key]}]`.green);
-                  if(++check==2) resolve();
-                }
-              });
-            else {
-              //console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreqTitle[key]}]`.green);
-              if(++check==2) resolve();
+      Object.keys(pageWordTable[id].IDToWordFreqBody).forEach((key) => {
+        bulk_body.find({
+          wordID: key
+        }).upsert().updateOne({
+          "$addToSet": {
+            docs: {
+              docID: id,
+              freq: pageWordTable[id].IDToWordFreqBody[key]
             }
           }
-        });
+        })
+      })
+    }); // end:: loop page id
 
-      });
-
-      Object.keys(wordFreqBody).forEach((key) => {
-        var _logHead = "[MODEL/INDEXTABLE/INVERTEDBODY/UPSERT]";
-        model.dbModel.invertedTableBody.update({
-          wordID: key,
-          "docs.docID": id
-        }, {
-          $set: { "docs.$.freq": wordFreqBody[key] }
-        }, (err, raw) => {
-          if (err) {console.error(err); reject(err);}
+    var _logHead = "[MODEL/INDEXTABLE/INVERTED/UPSERT-BULK]";
+    return Promise.all([
+      new Promise((resolve, reject) => {
+        bulk_title.execute((err, results) => {
+          if (err) {console.error(err); }
           else {
-            if(!raw.nMatched)
-              model.dbModel.invertedTableBody.update({
-                wordID: key
-              }, {
-                $addToSet: { docs: { docID: id, freq: wordFreqBody[key]} }
-              }, {upsert: true}, (err, raw) => {
-                if (err) {console.error(err); reject(err);}
-                else {
-                  //console.info(`${_logHead}\tInserted posting for Word[${key}]: Page[${id}] - Freq[${wordFreqBody[key]}]`.green);
-                  if(++check==2) resolve();
-                }
-              });
-            else {
-             // console.info(`${_logHead}\tUpdated posting for Word[${key}]: Page[${id}] - Freq[${wordFreqBody[key]}]`.green);
-              if(++check==2) resolve();
-            }
+            console.log(`${_logHead}[TITLE]\tModified ${results.nModified}; Inserted ${results.nInserted}; Upserted ${results.nUpserted}`.green);
+            resolve(results);
           }
-        });
-
-      });
-
-    });
+        })
+      }),
+      new Promise((resolve, reject) => {
+        bulk_body.execute((err, results) => {
+          if (err) {console.error(err); }
+          else {
+            console.log(`${_logHead}[BODY]\tModified ${results.nModified}; Inserted ${results.nInserted}; Upserted ${results.nUpserted}`.green);
+            resolve(results);
+          }
+        })
+      })
+    ])
   };
 
   returnFx.getWordPosting = ((wordID, findTitle, limit) => {   // [listNum] true: Title, false: Body

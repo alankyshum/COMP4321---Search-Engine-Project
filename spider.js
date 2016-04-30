@@ -26,7 +26,7 @@ var writeCnt = cnt(1);
 var bulkOps = (cacheIndex) => {
 	// cacheIndex: local::cacheIndex, avoid being updated during
 	// other async page crawling process
-	Promise.all([
+	return Promise.all([
 		// return pageIDList, wordIDList
 		model.indexTable.page.upsertBulk(objectCache.pageCache[cacheIndex])
 		.then(() => {
@@ -43,15 +43,12 @@ var bulkOps = (cacheIndex) => {
 			pageWordTable = {}; // MAP:: ID <-> freq, array
 		idList[0].forEach((element) => { urlToID[element.url] = element._id; });
 		idList[1].forEach((element) => { wordToID[element.word] = element._id; });
-		console.log(idList[0]);
-		console.log(objectCache.pageCache[cacheIndex].length);
 		objectCache.pageCache[cacheIndex].forEach((page) => {
 			pageWordTable[urlToID[page.url]] = {
 				IDToWordFreqTitle: {},
 				IDToWordFreqBody: {},
-				IDToWordFreqArray: []
+				IDToWordFreqArray: [] // for forwardTable
 			};
-			console.log(`${urlToID[page.url]}: ${page.url}`);
 			Object.keys(page.wordFreqTitle).forEach((key) => {
 				pageWordTable[urlToID[page.url]].IDToWordFreqTitle[wordToID[key]] = page.wordFreqTitle[key];
 				pageWordTable[urlToID[page.url]].IDToWordFreqArray.push({
@@ -69,28 +66,31 @@ var bulkOps = (cacheIndex) => {
 		}); // end:: loop page --> prepare wordFreqTable
 
 		// WRITE TO DATABASE
-		try {
-			Promise.all([
+		if (Object.keys(pageWordTable).length) {
+			return Promise.all([
 				model.indexTable.forward.upsertBulk(pageWordTable),
-				// model.indexTable.inverted.upsertBulk(pageWordTable)
+				model.indexTable.inverted.upsertBulk(pageWordTable)
 			]);
-		} catch (e) {
-			console.error(e);
 		}
+		return resolve();
 	})
-	// .then(() => {
-	// 	// CLEAR CACHE
-	// 	console.log("CLEAR CACHE ...".red);
-	// 	objectCache.pageCache[cacheIndex] = [];
-	// 	objectCache.wordCache[cacheIndex] = [];
-	// })
+	.then(() => {
+		// CLEAR CACHE
+		console.log(`CLEAR CACHE [${cacheIndex}] ...`.red);
+		objectCache.pageCache[cacheIndex] = [];
+		objectCache.wordCache[cacheIndex] = [];
+		return new Promise((resolve) => {resolve(cacheIndex)})
+	})
 }
 
 // CORE FUNCTIONS
 // --------------
+var start = new Date();
 crawl.recursiveExtractLink(config.rootURL, (page) => {
-	objectCache.cacheIndex = parseInt((writeCnt.next().value - 1) / config.bulkWindow);
-	// console.info(`[${objectCache.cacheIndex}] ${page.title}`);
+	'use strict';
+	let _wCnt = writeCnt.next().value;
+	objectCache.cacheIndex = parseInt((_wCnt - 1) / config.bulkWindow);
+	// console.info(`[${objectCache.cacheIndex}/${_wCnt}] ${page.title}`);
 	if (!objectCache.pageCache[objectCache.cacheIndex])
 		objectCache.pageCache[objectCache.cacheIndex] = [];
 	if (!objectCache.wordCache[objectCache.cacheIndex])
@@ -102,11 +102,18 @@ crawl.recursiveExtractLink(config.rootURL, (page) => {
 	}
 
 }, (allPages) => {
-	console.info("FINISHED CRAWLING");
+	console.info("FINISHED MASTER PROCESS");
 
 	// HANDLE THE REMAINING ITEMS IN CACHE
 	if (objectCache.pageCache[objectCache.cacheIndex].length) {
-		bulkOps(objectCache.cacheIndex);
+		bulkOps(objectCache.cacheIndex)
+		.then((cleanedIndex) => {
+			if (cleanedIndex == objectCache.cacheIndex) {
+				console.log(`All cache are cleaned`.red);
+				console.log(`Elapsed ${(new Date() - start)/1000} seconds`);
+				process.exit();
+			}
+		});
 	}
 
 	// TODO: update childIDs from childLinks
