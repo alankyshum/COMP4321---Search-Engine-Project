@@ -93,7 +93,9 @@
 					entry.querySelector('.header').setAttribute('href', datum.url);
 					result.DOM.appendChild(entry);
 				})
+
 				// build pageination buttons
+				result.paginationDOM.innerHTML = "";
 				var numPages = parseInt(res.querySummary.resultsCnt / 10) + 1;
 				var pageBtn = document.importNode(result.pageinationTemplate, true);
 				pageBtn.querySelector('.pageBtn').textContent = 1;
@@ -111,20 +113,28 @@
 				query.DOM.focus();
 				result.DOM.classList.add('typing');
 				query.formDOM.classList.remove('fadedOut');
-				if (e.keyCode === 13) {
-					// animate input box
-					query.DOM.classList.add('shrinkToLoadingBar');
-					query.sound.play();
-					// submit form
-					query.submit()
-					.then((data) => {
-						setTimeout(() => {
-							result.buildDOM(data);
-							query.DOM.classList.remove('shrinkToLoadingBar');
-							query.formDOM.classList.add('fadedOut');
-							result.DOM.classList.remove('typing');
-						}, 0);
-					});
+				switch (e.keyCode) {
+					case 27:
+						query.formDOM.classList.add('fadedOut');
+						result.DOM.classList.remove('typing');
+						break;
+					case 13:
+						// animate input box
+						query.DOM.classList.add('shrinkToLoadingBar');
+						query.sound.play();
+						// submit form
+						query.submit()
+						.then((data) => {
+							setTimeout(() => {
+								result.buildDOM(data);
+								query.DOM.classList.remove('shrinkToLoadingBar');
+								query.formDOM.classList.add('fadedOut');
+								result.DOM.classList.remove('typing');
+							}, 0);
+						});
+						break;
+					default:
+						break;
 				}
 			}
 		</script>
