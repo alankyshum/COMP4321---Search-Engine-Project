@@ -1,5 +1,6 @@
 const model = require('../model') // [need review] strange dependency, model <=> indexTable
   , colors = require('colors')
+  , config = require('../../config.json')
   , error = require('../error');
 /**
  * MODULE:: FORWARD + INVERTED INDEX
@@ -15,19 +16,19 @@ module.exports.word = (() => {
   var returnFx = {};
 
   returnFx.upsert = (wordList) => {
-    var _logHead = "[MODEL/INDEXTABLE/WORD/UPSERT]";
-
+    var _logHead = "[MODEL/INDEXTABLE/WORD/UPSERT-BULK]";
     return new Promise((resolve, reject) => {
-      var check = 0;
+      var bulk = model.dbModel.wordList.collection.initializeUnorderedBulkOp();
       wordList.forEach((word) => {
-        model.dbModel.wordList.collection.update({word: word}, {word: word}, {upsert: true}, (err, docs) => {
-          if (err) error.mongo.parse(err, reject)
-          // All Words have been inserted => resolve promise
-          if(++check==Object.keys(wordList).length) {   // [need review] racing conditions
-            console.info(`${_logHead}\tUpserting <${wordList.length} words`.green);
-            resolve();
-          }
-        });
+        bulk.find({word: word}).upsert().updateOne({word: word});
+      });
+      bulk.execute((err, results) => {
+        if(err)
+          error.mongo.parse(err, reject);
+        else {
+          console.info(`${_logHead}\tModified ${results.nModified}`.green);
+          return resolve(wordList);
+        }
       });
     });
   }
@@ -50,17 +51,20 @@ module.exports.word = (() => {
     })
   }
 
+  returnFx.getWordID = (wordList) => {
+    return new Promise((resolve, reject) => {
+      model.dbModel.wordList.find({word: {$in: wordList}}, (err, words) => {
+        if (err) {console.error(err); reject(err)}
+        resolve(words);
+      })
+    })
+  }
+
   returnFx.getIDs = (wordList) => {
     return new Promise((resolve, reject) => {
       model.dbModel.wordList.find({word: {$in: wordList}}, '_id', (err, words) => {
         if (err) {console.error(err); reject(err)}
-        var wordIDList = null;
-        if (words) {
-          wordIDList = words.map((word) => {
-            return word._id
-          });
-        }
-        resolve(wordIDList);
+        resolve(words);
       })
     })
   }
@@ -107,6 +111,33 @@ module.exports.page = (() => {
     }) // end:: Promise
   }
 
+  returnFx.upsertBulk = (pages) => {
+    var _logHead = "[MODEL/INDEXTABLE/PAGE/UPSERT-BULK]";
+    return new Promise((resolve, reject) => {
+      var bulk = model.dbModel.pageInfo.collection.initializeUnorderedBulkOp();
+      pages.forEach((page) => {
+        bulk.find({
+          url: page.url
+        }).upsert().updateOne({
+          title: page.title,
+          url: page.url,
+          lastModifiedDate: page.lastModifiedDate,
+          lastCrawlDate: page.lastCrawlDate,
+          size: page.pageSize,
+          childLinks: page.childLinks
+        });
+      }) // end: forEach
+      bulk.execute((err, result) => {
+        if (err)
+          error.mongo.parse(err, reject, resolve);
+        else {
+          console.info(`${_logHead}\tModified ${result.nModified}`.green);
+          resolve();
+        }
+      })
+    })
+  }
+
   returnFx.getAllID = () => {
     return new Promise((resolve, reject) => {
       model.dbModel.pageInfo.find(null, '_id url', (err, pages) => {
@@ -121,6 +152,26 @@ module.exports.page = (() => {
       model.dbModel.pageInfo.findOne({url: url}, '_id', (err, url) => {
         if (err) {console.error(err); reject(err)}
         resolve(url._id);
+      })
+    })
+  }
+
+  returnFx.getIDs = (urlList) => {
+    return new Promise((resolve, reject) => {
+      model.dbModel.pageInfo.find({url: {$in: urlList}}, '_id', (err, urls) => {
+        if (err) {console.error(err); reject(err)}
+        resolve(urls.map((url) => {
+          return url.id
+        }));
+      })
+    })
+  }
+
+  returnFx.getURLID = (urlList) => {
+    return new Promise((resolve, reject) => {
+      model.dbModel.pageInfo.find({url: {$in: urlList}}, 'url _id', (err, urls) => {
+        if (err) {console.error(err); return reject(err)}
+        resolve(urls);
       })
     })
   }
@@ -181,6 +232,32 @@ module.exports.forward = (() => {
 
     });
   }
+
+
+  returnFx.upsertBulk = (pageWordTable) => {
+    var _logHead = "[MODEL/INDEXTABLE/FORWARD/UPSERT-BULK]";
+    return new Promise((resolve, reject) => {
+      var bulk = model.dbModel.forwardTable.collection.initializeUnorderedBulkOp();
+      try {
+        Object.keys(pageWordTable).forEach((id) => {
+          bulk.find({docID: id}).upsert().updateOne({
+            $addToSet: {words: {$each: pageWordTable[id].IDToWordFreqArray}}
+          })
+        })
+
+        bulk.execute((err, result) => {
+          if (err) {
+            error.mongo.parse(err, reject, resolve)
+          } else {
+            console.info(`${_logHead}\tUpserted Forward List: ${result.nUpserted} ids`.green);
+            resolve();
+          }
+        })
+
+      } catch (e) {console.error(e);}
+    }); // end:: promise
+  }
+
 
   returnFx.getDocList = (id) => {
     return new Promise((resolve, reject) => {
@@ -269,6 +346,60 @@ module.exports.inverted = (() => {
       });
 
     });
+  };
+
+  returnFx.upsertBulk = (pageWordTable) => {
+    var bulk_title = model.dbModel.invertedTableTitle.collection.initializeUnorderedBulkOp()
+      , bulk_body = model.dbModel.invertedTableBody.collection.initializeUnorderedBulkOp();
+
+    Object.keys(pageWordTable).forEach((id) => {
+      Object.keys(pageWordTable[id].IDToWordFreqTitle).forEach((key) => {
+        bulk_title.find({
+          wordID: key
+        }).upsert().updateOne({
+          "$addToSet": {
+            docs: {
+              docID: id,
+              freq: pageWordTable[id].IDToWordFreqTitle[key]
+            }
+          }
+        })
+      })
+      Object.keys(pageWordTable[id].IDToWordFreqBody).forEach((key) => {
+        bulk_body.find({
+          wordID: key
+        }).upsert().updateOne({
+          "$addToSet": {
+            docs: {
+              docID: id,
+              freq: pageWordTable[id].IDToWordFreqBody[key]
+            }
+          }
+        })
+      })
+    }); // end:: loop page id
+
+    var _logHead = "[MODEL/INDEXTABLE/INVERTED/UPSERT-BULK]";
+    return Promise.all([
+      new Promise((resolve, reject) => {
+        bulk_title.execute((err, results) => {
+          if (err) {console.error(err); }
+          else {
+            console.log(`${_logHead}[TITLE]\tModified ${results.nModified}; Inserted ${results.nInserted}; Upserted ${results.nUpserted}`.green);
+            resolve(results);
+          }
+        })
+      }),
+      new Promise((resolve, reject) => {
+        bulk_body.execute((err, results) => {
+          if (err) {console.error(err); }
+          else {
+            console.log(`${_logHead}[BODY]\tModified ${results.nModified}; Inserted ${results.nInserted}; Upserted ${results.nUpserted}`.green);
+            resolve(results);
+          }
+        })
+      })
+    ])
   };
 
   returnFx.getWordPosting = ((wordID, findTitle, limit) => {   // [listNum] true: Title, false: Body
