@@ -3,5 +3,6 @@
   "mongoDB": "mongodb://localhost:27017/comp4321",
   "resultFile": "spider_result.txt",
   "maxPages": 30,
+  "ttl": 1000,
   "bulkWindow": 10
 }

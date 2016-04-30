@@ -1,5 +1,6 @@
 const model = require('../model') // [need review] strange dependency, model <=> indexTable
   , colors = require('colors')
+  , config = require('../../config.json')
   , error = require('../error');
 /**
  * MODULE:: FORWARD + INVERTED INDEX
@@ -115,7 +116,9 @@ module.exports.page = (() => {
     return new Promise((resolve, reject) => {
       var bulk = model.dbModel.pageInfo.collection.initializeUnorderedBulkOp();
       pages.forEach((page) => {
-        bulk.find({url: page.url}).upsert().updateOne({
+        bulk.find({
+          url: page.url
+        }).upsert().updateOne({
           title: page.title,
           url: page.url,
           lastModifiedDate: page.lastModifiedDate,
@@ -128,7 +131,7 @@ module.exports.page = (() => {
         if (err)
           error.mongo.parse(err, reject, resolve);
         else {
-          console.info(`${_logHead}\tUpserted ${pages.length} URLs`.green);
+          console.info(`${_logHead}\tUpserted ${result.nUpserted} URLs`.green);
           resolve();
         }
       })
@@ -160,6 +163,15 @@ module.exports.page = (() => {
         resolve(urls.map((url) => {
           return url.id
         }));
+      })
+    })
+  }
+
+  returnFx.getURLID = (urlList) => {
+    return new Promise((resolve, reject) => {
+      model.dbModel.pageInfo.find({url: {$in: urlList}}, 'url _id', (err, urls) => {
+        if (err) {console.error(err); return reject(err)}
+        resolve(urls);
       })
     })
   }
@@ -222,27 +234,27 @@ module.exports.forward = (() => {
   }
 
 
-  returnFx.upsertBulk = (wordFreqArray, idList) => {
+  returnFx.upsertBulk = (pageWordTable) => {
     var _logHead = "[MODEL/INDEXTABLE/FORWARD/UPSERT]";
     return new Promise((resolve, reject) => {
-
       var bulk = model.dbModel.forwardTable.collection.initializeUnorderedBulkOp();
-      idList.forEach((id) => {
-        bulk.find({docID: id}).upsert().updateOne({
-          docID: id,
-          $addToSet: {words: {$each: wordFreqArray}}
+      try {
+        Object.keys(pageWordTable).forEach((id) => {
+          bulk.find({docID: id}).upsert().updateOne({
+            $addToSet: {words: {$each: pageWordTable[id].IDToWordFreqArray}}
+          })
         })
-      });
 
-      bulk.execute((err, result) => {
-        if (err) {
-          error.mongo.parse(err, reject, resolve)
-        } else {
-          console.info(`${_logHead}\tUpserted Forward List: ${id.length} ids`.green);
-          resolve();
-        }
-      });
+        bulk.execute((err, result) => {
+          if (err) {
+            error.mongo.parse(err, reject, resolve)
+          } else {
+            console.info(`${_logHead}\tUpserted Forward List: ${result.nUpserted} ids`.green);
+            resolve();
+          }
+        })
 
+      } catch (e) {console.error(e);}
     }); // end:: promise
   }
 
@@ -343,7 +355,16 @@ module.exports.inverted = (() => {
 
       var bulk = model.dbModel.invertedTableTitle.collection.initializeUnorderedBulkOp();
       idList.forEach((id) => {
-
+        bulk.find({
+          wordID: key
+        }).upsert().updateOne({
+          "$addToSet": {
+            docs: {
+              docID: id,
+              freq: wordFreqTitle[key]
+            }
+          }
+        })
       })
 
       Object.keys(wordFreqTitle).forEach((key) => {
