@@ -53,10 +53,24 @@ module.exports.find = (wordList, limit) => {
       }) // end:: found matching posts
       .then((matchedDocIDs) => {
         console.log(`[SEARCHING] MATCH DOC TITLE:ID\t${matchedDocIDs.title}`.yellow);
-        console.log(`[SEARCHING] MATCH DOC BODY:ID:\t${matchedDocIDs.body}`.yellow);
+        console.log(`[SEARCHING] MATCH DOC BODY:ID\t${matchedDocIDs.body}`.yellow);
         model.indexTable.page.getPages(matchedDocIDs.body, ["title", "url", "-_id"])
-        .then((pages) => {
-          return resolve(pages);
+        // .then((pages) => {
+        //   return resolve(pages);
+        // })
+        .then((dummyOutput) => {
+          resolve({
+            data: (new Array(20)).fill().map((item, i) => {
+              return {
+                title: `Page Title ${i}`,
+                url: `http://www.google.com/q==${i}`
+              }
+            }),
+            querySummary: {
+              time: '0.01s',
+              resultsCnt: 230
+            }
+          })
         })
       })
     })
