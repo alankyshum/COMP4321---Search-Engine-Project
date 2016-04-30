@@ -2,13 +2,12 @@
 // VARIABLES ----------------
 // --------------------------
 $darkGrey: #545454;
-
+$lightGrey: #ddd;
+$primaryBlue: #24A3D5;
 
 // --------------------------
 // STYLES -------------------
 // --------------------------
-[data-layer='1'] {
-}
 #queryForm {
   position: fixed;
   display: flex;
@@ -16,6 +15,11 @@ $darkGrey: #545454;
   width: 100%;
   height: 100%;
   background: transparent;
+  transition: opacity .3s;
+  &.fadedOut {
+    opacity: 0;
+    z-index: -1;
+  }
   // input form
   #query {
     display: block;
@@ -23,7 +27,8 @@ $darkGrey: #545454;
     max-height: 30vh;
     margin: auto;
     text-align: center;
-    color: $darkGrey;
+    background-color: $primaryBlue;
+    color: white;
     border: none;
     font-family: "Helvetica CE 35", "Helvetica Neue", "Source Sans Pro", "Century Gothic", Sans-serif;
     font-size: 48px;
@@ -45,25 +50,112 @@ $darkGrey: #545454;
   }
 }
 
+// --------------------------
+// RESULT ITEMS -------------
+// --------------------------
+body {
+  color: $darkGrey;
+  font-family: "Source Han Sans TWHK", "Helvetica CE 35", "Century Gothic", sans-serif !important;
+  font-weight: 200;
+}
+#results {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  .resultItem {
+    display: block;
+    width: 370px;
+    margin: 10px 5px;
+    border: 1px solid $lightGrey;
+    border-radius: 2px;
+    .header {
+      display: inline-block;
+      width: 100%;
+      height: 50px;
+      text-decoration: none;
+      border-bottom: 1px solid $lightGrey;
+      transition: color .3s, background-color .3s;
+      .favIcon {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+        margin-right: 10px;
+        text-align: center;
+        color: white;
+        background-color: $primaryBlue;
+        font-size: 36px;
+      }
+      .pageTitle {
+        display: inline-block;
+        overflow: hidden;
+        width: calc(100% - 100px);
+        height: 40px;
+        vertical-align: middle;
+        white-space: nowrap;
+        text-decoration: none;
+        text-overflow: ellipsis;
+        color: $primaryBlue;
+        font-weight: 600;
+      }
+      &:hover, &:focus {
+        background-color: $primaryBlue;
+        .pageTitle {
+          color: white;
+          transition: color .3s;
+        }
+      }
+    }
+    // end:: header
+    .pageInfo {
+      padding: 7px 15px;
+    }
+  }
+}
+#pagination {
+  width: 70vw;
+  margin: 30px auto 20px auto;
+  text-align: center;
+  .pageBtn {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    margin: 2px 5px;
+    color: $lightGrey;
+    border: 1px solid $lightGrey;
+    border-radius: 2px;
+    &:hover, &:focus {
+      cursor: pointer;
+      text-align: center;
+      color: white;
+      background-color: $darkGrey;
+    }
+    &.active, &.active:hover, &.active:focus {
+      color: white;
+      border: 1px solid $primaryBlue;
+      background-color: $primaryBlue;
+    }
+  }
+}
 
 // --------------------------
 // ANIMATIONS ---------------
 // --------------------------
 @keyframes shrinkToLoadingBar {
 	0% {
-		background-color: transparent;
-		color: $darkGrey;
+		background-color: $primaryBlue;
+    color: white;
 	}
 	3% {
-		background-color: $darkGrey;
-		color: white;
+		background-color: transparent;
+    color: $primaryBlue;
 	}
 	6% {
-		background-color: transparent;
-		color: $darkGrey;
+		background-color: $primaryBlue;
+		color: white;
 	}
 	9% {
-		background-color: $darkGrey;
+    color: $primaryBlue;
 	}
 	30% {
 		max-height: 3px;
@@ -77,6 +169,7 @@ $darkGrey: #545454;
 	100% {
 		max-height: 3px;
 		max-width: 3px;
-		background-color: $darkGrey;
+		background-color: $primaryBlue;
+    color: $primaryBlue;
 	}
 }

@@ -14,6 +14,22 @@
 		</form>
 		<div id="results">
 		</div>
+		<div id="pagination">
+		</div>
+
+		<template id="resultTemplate">
+			<div class="resultItem">
+				<a class='header' href='#'>
+					<div class="favIcon"></div>
+					<div class="pageTitle"></div>
+				</a>
+				<div class="pageInfo"></div>
+			</div>
+		</template>
+		<template id="pageBtnTemplate">
+			<div class="pageBtn">
+			</div>
+		</template>
 
 		<script>
 			// ----------------
@@ -25,7 +41,10 @@
 				sound: document.getElementById('soundEffect')
 			};
 			var result = {
-				DOM: document.getElementById('results')
+				DOM: document.getElementById('results'),
+				template: document.getElementById('resultTemplate').content,
+				paginationDOM: document.getElementById('pagination'),
+				pageinationTemplate: document.getElementById('pageBtnTemplate').content
 			}
 
 			// -------------------
@@ -58,14 +77,40 @@
 			}
 
 			// RESULT RELATED -----------
-			result.buildDOM = (data) => {
-				console.log(data);
+			result.buildDOM = (res) => {
+				// build results div
+				result.DOM.innerHTML = "";
+				res.data.forEach((datum) => {
+					var entry = document.importNode(result.template, true);
+					if (datum.favIcon) {
+						entry.querySelector('.favIcon').innerHTML = `<img src='${datum.favIcon}'/>`;
+					} else {
+						entry.querySelector('.favIcon').textContent = datum.title.substr(0, 1);
+					}
+					entry.querySelector('.pageTitle').textContent = datum.title;
+					var testString = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+					entry.querySelector('.pageInfo').textContent = testString.substr(0, Math.random()*testString.length)
+					entry.querySelector('.header').setAttribute('href', datum.url);
+					result.DOM.appendChild(entry);
+				})
+				// build pageination buttons
+				var numPages = parseInt(res.querySummary.resultsCnt / 10) + 1;
+				var pageBtn = document.importNode(result.pageinationTemplate, true);
+				pageBtn.querySelector('.pageBtn').textContent = 1;
+				pageBtn.querySelector('.pageBtn').classList.add('active');
+				result.paginationDOM.appendChild(pageBtn);
+				for (var i = 2; i <= numPages; i++) {
+					pageBtn = document.importNode(result.pageinationTemplate, true);
+					pageBtn.querySelector('.pageBtn').textContent = i;
+					result.paginationDOM.appendChild(pageBtn);
+				}
 			}
 
 			// KEY LISTENER -------------
 			document.onkeypress = (e) => {
 				query.DOM.focus();
 				result.DOM.classList.add('typing');
+				query.formDOM.classList.remove('fadedOut');
 				if (e.keyCode === 13) {
 					// animate input box
 					query.DOM.classList.add('shrinkToLoadingBar');
@@ -73,9 +118,12 @@
 					// submit form
 					query.submit()
 					.then((data) => {
-						result.buildDOM(data);
-						query.DOM.classList.remove('shrinkToLoadingBar');
-						result.DOM.classList.remove('typing');
+						setTimeout(() => {
+							result.buildDOM(data);
+							query.DOM.classList.remove('shrinkToLoadingBar');
+							query.formDOM.classList.add('fadedOut');
+							result.DOM.classList.remove('typing');
+						}, 0);
 					});
 				}
 			}
