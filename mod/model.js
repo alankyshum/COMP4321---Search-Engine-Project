@@ -25,6 +25,7 @@ _schema.wordList = new Schema({
 _schema.pageInfo = new Schema({
   title: String,
   url: {type: String, unique: true},
+  favIconUrl: {type: String},
   lastModifiedDate: Date,
   lastCrawlDate: Date,
   size: {type: Number, min: 0},

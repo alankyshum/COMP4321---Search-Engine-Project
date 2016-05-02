@@ -90,7 +90,7 @@ crawl.recursiveExtractLink(config.rootURL, (page) => {
 	'use strict';
 	let _wCnt = writeCnt.next().value;
 	objectCache.cacheIndex = parseInt((_wCnt - 1) / config.bulkWindow);
-	// console.info(`[${objectCache.cacheIndex}/${_wCnt}] ${page.title}`);
+	console.info(`[${objectCache.cacheIndex}/${_wCnt}] ${page.title}`);
 	if (!objectCache.pageCache[objectCache.cacheIndex])
 		objectCache.pageCache[objectCache.cacheIndex] = [];
 	if (!objectCache.wordCache[objectCache.cacheIndex])

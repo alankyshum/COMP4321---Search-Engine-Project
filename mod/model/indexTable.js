@@ -121,6 +121,7 @@ module.exports.page = (() => {
         }).upsert().updateOne({
           title: page.title,
           url: page.url,
+          favIconUrl: page.favIconUrl,
           lastModifiedDate: page.lastModifiedDate,
           lastCrawlDate: page.lastCrawlDate,
           size: page.pageSize,

@@ -16,6 +16,11 @@ module.exports.extractLinks = (link) => {
 
 	return new Promise((resolve, reject) => {
 
+		var crawlTimeout = setTimeout(() => {
+			console.error(`[CRAWLER] Crawling ${link} timeout of [${config.crawlTimeout/1000}s] limit`);
+			reject("timeout");
+		}, config.crawlTimeOut);
+
 		var decoder = new StringDecoder('utf8');
 		(~link.indexOf('http://')?http:https).get(link, (res) => {
 
@@ -23,6 +28,10 @@ module.exports.extractLinks = (link) => {
       var data = "";
 
 			res.on('data', (chunk) => {
+				if (crawlTimeout) {
+					clearTimeout(crawlTimeout);
+					crawlTimeout = null;
+				}
         data += chunk;
 			});
 
@@ -31,9 +40,13 @@ module.exports.extractLinks = (link) => {
 				$('a[href]').each((a_i, a) => {
 					linkSet.add(url.resolve(link, $(a).attr('href')));
 			 	});
+				var favIcon = $('[rel]').filter((relItem_i, relItem) => {
+					return ~$(relItem).attr('rel').indexOf('shortcut')
+				})[0];
         resolve({
 					title: $('title').text() || "",
 					url: link.replace(/\/+$/, ''),
+					favIconUrl: favIcon?url.resolve(link, $(favIcon).attr('href')):"",
 					lastModifiedDate: res.headers["last-modified"] && new Date(res.headers["last-modified"]) || new Date(res.headers["date"]),
 					lastCrawlDate: new Date(),
 					pageSize: res.headers["content-length"] || data.length,
