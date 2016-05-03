@@ -1,4 +1,4 @@
-const model = require('../model') // [need review] strange dependency, model <=> indexTable
+const dbModel = require('../dbModel')
   , colors = require('colors')
   , config = require('../../config.json')
   , error = require('../error');
@@ -18,7 +18,7 @@ module.exports.word = (() => {
   returnFx.upsert = (wordList) => {
     var _logHead = "[MODEL/INDEXTABLE/WORD/UPSERT-BULK]";
     return new Promise((resolve, reject) => {
-      var bulk = model.dbModel.wordList.collection.initializeUnorderedBulkOp();
+      var bulk = dbModel.wordList.collection.initializeUnorderedBulkOp();
       wordList.forEach((word) => {
         bulk.find({word: word}).upsert().updateOne({word: word});
       });
@@ -35,7 +35,7 @@ module.exports.word = (() => {
 
   returnFx.getAllID = () => {
     return new Promise((resolve, reject) => {
-      model.dbModel.wordList.find(null, '_id word', (err, words) => {
+      dbModel.wordList.find(null, '_id word', (err, words) => {
         if (err) {console.error(err); reject(err)}
         resolve(words);
       })
@@ -44,7 +44,7 @@ module.exports.word = (() => {
 
   returnFx.getID = (word) => {
     return new Promise((resolve, reject) => {
-      model.dbModel.wordList.findOne({word: word}, '_id', (err, word) => {
+      dbModel.wordList.findOne({word: word}, '_id', (err, word) => {
         if (err) {console.error(err); reject(err)}
         if (word) resolve(word._id);
       })
@@ -53,7 +53,7 @@ module.exports.word = (() => {
 
   returnFx.getWordID = (wordList) => {
     return new Promise((resolve, reject) => {
-      model.dbModel.wordList.find({word: {$in: wordList}}, (err, words) => {
+      dbModel.wordList.find({word: {$in: wordList}}, (err, words) => {
         if (err) {console.error(err); reject(err)}
         resolve(words);
       })
@@ -62,7 +62,7 @@ module.exports.word = (() => {
 
   returnFx.getIDs = (wordList) => {
     return new Promise((resolve, reject) => {
-      model.dbModel.wordList.find({word: {$in: wordList}}, '_id word', (err, words) => {
+      dbModel.wordList.find({word: {$in: wordList}}, '_id word', (err, words) => {
         if (err) {console.error(err); return reject(err);}
         resolve(words);
       })
@@ -71,7 +71,7 @@ module.exports.word = (() => {
 
   returnFx.getWord = (id) => {
     return new Promise((resolve, reject) => {
-      model.dbModel.wordList.findById(id, (err, word) => {
+      dbModel.wordList.findById(id, (err, word) => {
         if (err) {console.error(err); reject(err)}
         resolve(word.word);
       })
@@ -97,7 +97,7 @@ module.exports.page = (() => {
         size: page.pageSize,
         childLinks: page.childLinks
       };
-      model.dbModel.pageInfo.update({
+      dbModel.pageInfo.update({
         url: page.url,
         lastCrawlDate: {$gt: new Date(page.lastCrawlDate.getTime()-1)}
       }, _newPageInfo, {upsert: true}, (err, raw) => {
@@ -114,7 +114,7 @@ module.exports.page = (() => {
   returnFx.upsertBulk = (pages) => {
     var _logHead = "[MODEL/INDEXTABLE/PAGE/UPSERT-BULK]";
     return new Promise((resolve, reject) => {
-      var bulk = model.dbModel.pageInfo.collection.initializeUnorderedBulkOp();
+      var bulk = dbModel.pageInfo.collection.initializeUnorderedBulkOp();
       pages.forEach((page) => {
         bulk.find({
           url: page.url
@@ -141,7 +141,7 @@ module.exports.page = (() => {
 
   returnFx.getAllID = () => {
     return new Promise((resolve, reject) => {
-      model.dbModel.pageInfo.find(null, '_id url', (err, pages) => {
+      dbModel.pageInfo.find(null, '_id url', (err, pages) => {
         if (err) {console.error(err); reject(err)}
         resolve(pages);
       })
@@ -150,7 +150,7 @@ module.exports.page = (() => {
 
   returnFx.getID = (url) => {
     return new Promise((resolve, reject) => {
-      model.dbModel.pageInfo.findOne({url: url}, '_id', (err, url) => {
+      dbModel.pageInfo.findOne({url: url}, '_id', (err, url) => {
         if (err) {console.error(err); reject(err)}
         resolve(url._id);
       })
@@ -159,7 +159,7 @@ module.exports.page = (() => {
 
   returnFx.getIDs = (urlList) => {
     return new Promise((resolve, reject) => {
-      model.dbModel.pageInfo.find({url: {$in: urlList}}, '_id', (err, urls) => {
+      dbModel.pageInfo.find({url: {$in: urlList}}, '_id', (err, urls) => {
         if (err) {console.error(err); reject(err)}
         resolve(urls.map((url) => {
           return url.id
@@ -170,7 +170,7 @@ module.exports.page = (() => {
 
   returnFx.getURLID = (urlList) => {
     return new Promise((resolve, reject) => {
-      model.dbModel.pageInfo.find({url: {$in: urlList}}, 'url _id', (err, urls) => {
+      dbModel.pageInfo.find({url: {$in: urlList}}, 'url _id', (err, urls) => {
         if (err) {console.error(err); return reject(err)}
         resolve(urls);
       })
@@ -180,7 +180,7 @@ module.exports.page = (() => {
   returnFx.getPage = (id, fields) => {
     return new Promise((resolve, reject) => {
       var _fieldsQuery = fields?fields.join(' '):"";
-      model.dbModel.pageInfo.findById(id, _fieldsQuery, (err, page) => {
+      dbModel.pageInfo.findById(id, _fieldsQuery, (err, page) => {
         if (err) {console.error(err); reject(err)}
         if (!page) return resolve(null);
         if (fields && fields.length === 1) resolve(page[fields[0]])
@@ -193,7 +193,7 @@ module.exports.page = (() => {
   returnFx.getPages = (idList, fields) => {
     return new Promise((resolve, reject) => {
       var _fieldsQuery = fields?fields.join(' '):"";
-      model.dbModel.pageInfo.find({_id: {$in: idList}}, _fieldsQuery, (err, pages) => {
+      dbModel.pageInfo.find({_id: {$in: idList}}, _fieldsQuery, (err, pages) => {
         if (err) {console.error(err); return reject(err);}
         if (!pages) return resolve(null);
         if (fields && fields.length === 1) resolve(pages.map((page) => {
@@ -203,10 +203,10 @@ module.exports.page = (() => {
       })
     })
   }
-  
+
   returnFx.getPagesWithChilds = (childsList) => {
     return new Promise((resolve, reject) => {
-      model.dbModel.pageInfo.find({childLinks: {$in: childsList} }, "url childLinks", (err, pages) => {
+      dbModel.pageInfo.find({childLinks: {$in: childsList} }, "url childLinks", (err, pages) => {
         if (err) {console.error(err); return reject(err);}
         resolve(pages);
       });
@@ -227,7 +227,7 @@ module.exports.forward = (() => {
 
     return new Promise((resolve, reject) => {
 
-      model.dbModel.forwardTable.update({
+      dbModel.forwardTable.update({
         docID: id
       }, {
         docID: id,
@@ -247,7 +247,7 @@ module.exports.forward = (() => {
   returnFx.upsertBulk = (pageWordTable) => {
     var _logHead = "[MODEL/INDEXTABLE/FORWARD/UPSERT-BULK]";
     return new Promise((resolve, reject) => {
-      var bulk = model.dbModel.forwardTable.collection.initializeUnorderedBulkOp();
+      var bulk = dbModel.forwardTable.collection.initializeUnorderedBulkOp();
       try {
         Object.keys(pageWordTable).forEach((id) => {
           bulk.find({docID: id}).upsert().updateOne({
@@ -272,26 +272,26 @@ module.exports.forward = (() => {
   returnFx.getDocList = (id) => {
     return new Promise((resolve, reject) => {
 
-      model.dbModel.forwardTable.find({docID: id}, 'docID words', (err, words) => {
+      dbModel.forwardTable.find({docID: id}, 'docID words', (err, words) => {
         if (err) {console.error(err); reject(err)}
         resolve(words);
       });
     });
   }
-  
+
   returnFx.getDocsList = (ids) => {
     return new Promise((resolve, reject) => {
 
-      model.dbModel.forwardTable.find({docID: {$in: ids}}, 'docID words', (err, words) => {
+      dbModel.forwardTable.find({docID: {$in: ids}}, 'docID words', (err, words) => {
         if (err) {console.error(err); reject(err)}
         resolve(words);
       });
     });
   }
-  
+
   returnFx.getNumOfDocs = () => {
     return new Promise((resolve, reject) => {
-      model.dbModel.forwardTable.count(null, (err, count) => {
+      dbModel.forwardTable.count(null, (err, count) => {
         if (err) {console.error(err); reject(err)}
         resolve(count);
       });
@@ -314,7 +314,7 @@ module.exports.inverted = (() => {
 
       Object.keys(wordFreqTitle).forEach((key) => {
         var _logHead = "[MODEL/INDEXTABLE/INVERTEDTITLE/UPSERT]";
-        model.dbModel.invertedTableTitle.update({
+        dbModel.invertedTableTitle.update({
           wordID: key,
           "docs.docID": id
         }, {
@@ -323,7 +323,7 @@ module.exports.inverted = (() => {
           if (err) {console.error(err); reject(err);}
           else {
             if(!raw.nMatched)
-              model.dbModel.invertedTableTitle.update({
+              dbModel.invertedTableTitle.update({
                 wordID: key
               }, {
                 $addToSet: { docs: { docID: id, freq: wordFreqTitle[key]} }
@@ -345,7 +345,7 @@ module.exports.inverted = (() => {
 
       Object.keys(wordFreqBody).forEach((key) => {
         var _logHead = "[MODEL/INDEXTABLE/INVERTEDBODY/UPSERT]";
-        model.dbModel.invertedTableBody.update({
+        dbModel.invertedTableBody.update({
           wordID: key,
           "docs.docID": id
         }, {
@@ -354,7 +354,7 @@ module.exports.inverted = (() => {
           if (err) {console.error(err); reject(err);}
           else {
             if(!raw.nMatched)
-              model.dbModel.invertedTableBody.update({
+              dbModel.invertedTableBody.update({
                 wordID: key
               }, {
                 $addToSet: { docs: { docID: id, freq: wordFreqBody[key]} }
@@ -378,8 +378,8 @@ module.exports.inverted = (() => {
   };
 
   returnFx.upsertBulk = (pageWordTable) => {
-    var bulk_title = model.dbModel.invertedTableTitle.collection.initializeUnorderedBulkOp()
-      , bulk_body = model.dbModel.invertedTableBody.collection.initializeUnorderedBulkOp();
+    var bulk_title = dbModel.invertedTableTitle.collection.initializeUnorderedBulkOp()
+      , bulk_body = dbModel.invertedTableBody.collection.initializeUnorderedBulkOp();
 
     Object.keys(pageWordTable).forEach((id) => {
       Object.keys(pageWordTable[id].IDToWordFreqTitle).forEach((key) => {
@@ -435,7 +435,7 @@ module.exports.inverted = (() => {
     // default parameter (limit)
     var query = typeof limit===undefined?{wordID: wordID}:{wordID: wordID, docs: {$slice: limit} };
     return new Promise((resolve, reject) => {
-      model.dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find(query , 'wordID docs', (err, postings) => {
+      dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find(query , 'wordID docs', (err, postings) => {
         if (err) {console.error(err); return reject(err);}
         resolve(postings);
       });
@@ -446,7 +446,7 @@ module.exports.inverted = (() => {
     // default parameter (limit)
     var query = typeof limit===undefined?{wordID: {$in: wordIDList} }:{wordID: {$in: wordIDList}, docs: {$slice: limit} };
     return new Promise((resolve, reject) => {
-      model.dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find(query, 'wordID docs', (err, postings) => {
+      dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find(query, 'wordID docs', (err, postings) => {
         console.log("DONE SEARCHING DOCUMENTS");
         if (err) {console.error(err); return reject(err);}
         resolve(postings);
