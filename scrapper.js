@@ -6,11 +6,12 @@ const stopword = require('./mod/stopword');
 // OPTIONAL LIBRARY
 const colors = require('colors');
 
+const config = require('./config.json');
+
 
 // CONSTANTS
-const rootLink = "https://www.cse.ust.hk/";  // TODO: Insert to DB by hardcoded, Link-ID <=> link Data
-const maxCrawlPages = 300;
-const dancePeriod = 180*1000;  // 180 seconds
+const rootLink = config.rootURL;
+const maxCrawlPages = config.maxPages;
 
 
 // CREATE INDEX FROM DOCUMENTS
@@ -63,12 +64,3 @@ var crawl = (link) => {
 
 // Server starts
 crawl(queue[0]);
-
-
-// Dance Cycle
-setInterval(() => {
-    queue = [rootLink];
-    checked = {};
-    crawledPages = 0;
-    crawl(queue[0]);
-}, dancePeriod);
