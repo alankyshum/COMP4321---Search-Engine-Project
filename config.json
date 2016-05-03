@@ -4,5 +4,7 @@
   "resultFile": "spider_result.txt",
   "maxPages": 300,
   "ttl": 1000,
-  "bulkWindow": 100
+  "bulkWindow": 100,
+  "maxRankPages": 50,
+  "titleWeight": 0.75    // bodyWeight = 1-titleWeight
 }

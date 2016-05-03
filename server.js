@@ -6,6 +6,7 @@
  //
  //
 const cluster = require('cluster');
+const config = require('../config.json');
 
 if (cluster.isMaster) {
 
@@ -34,7 +35,7 @@ if (cluster.isMaster) {
   app.use(express.static(`${__dirname}/frontend`));
   app.get('/query', (req, res) => {
     console.log(`[SERVER] GETTING SEARCH RESULTS OF "${req.query.s}"`);
-    search.find(model.words.getSearchables(req.query.s.split(' ')), 10)
+    search.find(model.words.wordFreq(req.query.s), config.maxRankPages)
     .then((results) => {
       res.setHeader('Content-Type', 'application/json');
       res.send(results);

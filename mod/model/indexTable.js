@@ -62,8 +62,8 @@ module.exports.word = (() => {
 
   returnFx.getIDs = (wordList) => {
     return new Promise((resolve, reject) => {
-      model.dbModel.wordList.find({word: {$in: wordList}}, '_id', (err, words) => {
-        if (err) {console.error(err); reject(err)}
+      model.dbModel.wordList.find({word: {$in: wordList}}, '_id word', (err, words) => {
+        if (err) {console.error(err); return reject(err);}
         resolve(words);
       })
     })
@@ -194,15 +194,24 @@ module.exports.page = (() => {
     return new Promise((resolve, reject) => {
       var _fieldsQuery = fields?fields.join(' '):"";
       model.dbModel.pageInfo.find({_id: {$in: idList}}, _fieldsQuery, (err, pages) => {
-        if (err) {console.error(err); reject(err)}
+        if (err) {console.error(err); return reject(err);}
         if (!pages) return resolve(null);
         if (fields && fields.length === 1) resolve(pages.map((page) => {
-          return page[fields[0]]
+          return page[fields[0]];
         }));
         else resolve(pages);
       })
     })
   }
+  
+  returnFx.getPagesWithChilds = (childsList) => {
+    return new Promise((resolve, reject) => {
+      model.dbModel.pageInfo.find({childLinks: {$in: childsList} }, "url childLinks", (err, pages) => {
+        if (err) {console.error(err); return reject(err);}
+        resolve(pages);
+      });
+    });
+  };
 
   return returnFx;
 })();
@@ -263,9 +272,28 @@ module.exports.forward = (() => {
   returnFx.getDocList = (id) => {
     return new Promise((resolve, reject) => {
 
-      model.dbModel.forwardTable.find({docID: id}, 'words', (err, words) => {
+      model.dbModel.forwardTable.find({docID: id}, 'docID words', (err, words) => {
         if (err) {console.error(err); reject(err)}
         resolve(words);
+      });
+    });
+  }
+  
+  returnFx.getDocsList = (ids) => {
+    return new Promise((resolve, reject) => {
+
+      model.dbModel.forwardTable.find({docID: {$in: ids}}, 'docID words', (err, words) => {
+        if (err) {console.error(err); reject(err)}
+        resolve(words);
+      });
+    });
+  }
+  
+  returnFx.getNumOfDocs = () => {
+    return new Promise((resolve, reject) => {
+      model.dbModel.forwardTable.count(null, (err, count) => {
+        if (err) {console.error(err); reject(err)}
+        resolve(count);
       });
     });
   }
@@ -407,20 +435,20 @@ module.exports.inverted = (() => {
     // default parameter (limit)
     var query = typeof limit===undefined?{wordID: wordID}:{wordID: wordID, docs: {$slice: limit} };
     return new Promise((resolve, reject) => {
-      model.dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find(query , 'docs', (err, postings) => {
-        if (err) {console.error(err); reject(err)}
+      model.dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find(query , 'wordID docs', (err, postings) => {
+        if (err) {console.error(err); return reject(err);}
         resolve(postings);
       });
-    })
+    });
   });
 
   returnFx.getWordPostings = ((wordIDList, findTitle, limit) => {   // [listNum] true: Title, false: Body
+    // default parameter (limit)
+    var query = typeof limit===undefined?{wordID: {$in: wordIDList} }:{wordID: {$in: wordIDList}, docs: {$slice: limit} };
     return new Promise((resolve, reject) => {
-      model.dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find({
-        wordID: {$in: wordIDList}
-      }, 'docs', (err, postings) => {
+      model.dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find(query, 'wordID docs', (err, postings) => {
         console.log("DONE SEARCHING DOCUMENTS");
-        if (err) {console.error(err); reject(err)}
+        if (err) {console.error(err); return reject(err);}
         resolve(postings);
       });
     });
