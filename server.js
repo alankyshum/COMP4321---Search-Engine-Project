@@ -5,8 +5,9 @@
  // |___/_/\_\_| |_|_\___|___/___/ |___/___|_|_\ \_/ |___|_|_\
  //
  //
+
 const cluster = require('cluster');
-const config = require('../config.json');
+const config = require('./config.json');
 
 if (cluster.isMaster) {
 

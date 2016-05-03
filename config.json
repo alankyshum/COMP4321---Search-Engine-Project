@@ -6,5 +6,5 @@
   "ttl": 1000,
   "bulkWindow": 100,
   "maxRankPages": 50,
-  "titleWeight": 0.75    // bodyWeight = 1-titleWeight
+  "titleWeight": 0.75
 }
