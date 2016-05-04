@@ -17,6 +17,11 @@
 		</div>
 		<div id="pagination">
 		</div>
+		<div id="querySummary" class='hidden'>
+			<p>
+				Retrieved <span class="numResults"></span> results in <span class="queryTime"></span> seconds.
+			</p>
+		</div>
 
 		<template id="resultTemplate">
 			<div class="resultItem">
@@ -43,7 +48,8 @@
 				DOM: document.getElementById('query'),
 				formDOM: document.getElementById('queryForm'),
 				suggestedWordDOM: document.getElementById('suggestedWords'),
-				sound: document.getElementById('soundEffect')
+				sound: document.getElementById('soundEffect'),
+				summaryDOM: document.getElementById('querySummary')
 			};
 			var result = {
 				DOM: document.getElementById('results'),
@@ -109,6 +115,7 @@
 						<h2>Sorry, no webpage matches</h2>
 					</div>`;
 					emptyChildren(result.paginationDOM);
+					query.summaryDOM.classList.add('hidden');
 				} else {
 					// build results div
 					result.DOM.innerHTML = "";
@@ -140,7 +147,13 @@
 						pageBtn.querySelector('.pageBtn').textContent = i;
 						result.paginationDOM.appendChild(pageBtn);
 					}
-				}
+
+					// query summary
+					query.summaryDOM.classList.remove('hidden');
+					query.summaryDOM.querySelector('.queryTime').textContent = res.querySummary.time;
+					query.summaryDOM.querySelector('.numResults').textContent = res.querySummary.resultsCnt;
+
+				} // end:: with results
 			} // end:: buildBOM
 
 			// KEY LISTENER -------------
