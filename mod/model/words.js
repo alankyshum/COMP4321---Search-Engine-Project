@@ -65,5 +65,39 @@ var wordPos = (title, body) => {
   return wordPos;
 }
 
+var wordPhrase = (wordString) => {
+  var wordPhrase = {};  // wordPhrase = {"phrase": [word1, word2, ...] }
+  
+  console.log(wordString);
+  
+  var parsed="";
+  
+  for(i=0;i<wordString.length;i++)
+    if(wordString.charAt(i)!='\"')
+      parsed=parsed.concat(wordString.charAt(i));
+    else parsed=parsed.concat(" ",wordString.charAt(i)," ");
+  
+  console.log(parsed);
+  
+  var wordList2 = parsed.match(/(\w|\")+/g);
+  wordList2.push("dummy");    // dummy is to make checking below correct
+  console.log(wordList2);
+  console.log("wordList end");
+  
+  var check = 0, temp=[];
+  getSearchables(wordList2).forEach((word) => {
+    if(check==0&&temp.length!=0){
+      wordPhrase[temp.join(" ")] = temp;
+      temp=[];
+    }
+    
+    if(word=="\"") check=1-check;
+    else if(check==1){ temp.push(word); }
+  });
+  
+  return wordPhrase;
+};
+
 module.exports.wordFreq = wordFreq;
 module.exports.wordPos = wordPos;
+module.exports.wordPhrase = wordPhrase;

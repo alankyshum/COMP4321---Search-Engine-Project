@@ -36,7 +36,7 @@ const config = require('./config.json');
   app.use(express.static(`${__dirname}/frontend`));
   app.get('/query', (req, res) => {
     console.log(`[SERVER] GETTING SEARCH RESULTS OF "${req.query.s}"`);
-    search.find(model.words.wordFreq(req.query.s), config.maxRankPages)
+    search.find(model.words.wordFreq(req.query.s), model.words.wordPhrase(req.query.s), config.maxRankPages)
     .then((results) => {
       res.setHeader('Content-Type', 'application/json');
       res.send(results);
