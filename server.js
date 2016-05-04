@@ -35,8 +35,8 @@ if (cluster.isMaster) {
 
   app.use(express.static(`${__dirname}/frontend`));
   app.get('/query', (req, res) => {
-    console.log(`[SERVER] GETTING SEARCH RESULTS OF "${req.query.s}"`.green);
-    search.find(model.words.wordFreq(req.query.s), config.maxRankPages)
+    console.log(`[SERVER] GETTING SEARCH RESULTS OF "${req.query.s}"`);
+    search.find(model.words.wordFreq(req.query.s), model.words.wordPhrase(req.query.s), config.maxRankPages)
     .then((results) => {
       res.setHeader('Content-Type', 'application/json');
       res.send(results);

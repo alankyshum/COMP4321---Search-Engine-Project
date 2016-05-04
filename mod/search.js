@@ -8,7 +8,7 @@ const model = require('./model')
   , config = require('../config.json')
   , cache = require('memory-cache');
 
-module.exports.find = (wordFreq, limit) => {   // wordFreq = {word: freq};
+module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: freq};  // wordPhrase = {"phrase": [word1, word2, ...] }
 
   // STORING BASIC INFORMATION OF QUERY RESULTS
   var queryStat = {
@@ -28,6 +28,9 @@ module.exports.find = (wordFreq, limit) => {   // wordFreq = {word: freq};
       // Lookup wordID to word
       var wordIDToWordLookup = {};
       wordsData.forEach((word) => { wordIDToWordLookup[word._id] = word.word; });
+      // Lookup word to wordID
+      var wordToWordIDLookup = {};
+      wordsData.forEach((word) => { wordToWordIDLookup[word.word] = word._id; });
 
       model.indexTable.forward.getNumOfDocs()    // Get N for computing idf
       .then((N) => {
@@ -113,12 +116,98 @@ module.exports.find = (wordFreq, limit) => {   // wordFreq = {word: freq};
         .then((mergedRankDocIDs) => {
           console.log(`[SEARCHING] MATCH DOC TITLE:ID\t${mergedRankDocIDs}`.yellow);
 
-          model.indexTable.forward.getDocsList(mergedRankDocIDs)  // [{docID: X, words: [{ wordID: X, freq: X}, ...] }, ...]
+          model.indexTable.forward.getDocsList(mergedRankDocIDs)  // [{docID: X, words: [{ wordID: X, freq: X, wordPos: X}, ...] }, ...]
           .then((wordsData) => {
 
             // Call it [2nd piece] that will be used in final process
             var wordsLookup = {}; // {docID: [{ wordID: X, freq: X}, ...] }
             wordsData.forEach((posting) => { wordsLookup[posting.docID]=posting.words; });
+            var phraseLookup = {}; // {docID: { wordID: [pos1, pos2, ...] } }
+            wordsData.forEach((posting) => {
+              phraseLookup[posting.docID]={};
+              posting.words.forEach((word) => {
+                phraseLookup[posting.docID][word.wordID]=word.wordPos;
+              });
+            });
+            console.log(phraseLookup);
+            console.log('check1');
+
+            // Phrase handling
+            Object.keys(wordPhrase).forEach((phrase) => {
+              wordPhrase[phrase] = wordPhrase[phrase].map((word) => { return wordToWordIDLookup[word]; });
+            });
+            console.log(wordPhrase);
+
+            // Direct filter out documents do not contain phrase
+            var tempRankDocIDs=[];
+            mergedRankDocIDs.forEach((docID) => {
+
+              console.log(docID);
+
+              var finalCheck = 1;
+              Object.keys(wordPhrase).forEach((phrase) => {
+                var posListArray = [];
+                wordPhrase[phrase].forEach((wordID) => {
+                  if(phraseLookup[docID][wordID]!==undefined)
+                    posListArray.push(phraseLookup[docID][wordID]);
+                  else posListArray.push([]);
+                });
+
+                console.log("check mid");
+                console.log(posListArray);
+
+                var posListLookup = {}; // {pos: wordIndex}
+                var posListQueue = []; // posListQueue = [wordID1, wordID2, ..... ]
+                posListArray.forEach((array, index) => {
+                  array.forEach((pos) => {
+                    posListLookup[pos]=index;
+                  });
+                });
+
+                console.log("check mid2");
+                console.log(posListLookup);
+
+                var lastPos=-100;
+                Object.keys(posListLookup).map((s) => { return parseInt(s); }).sort((x,y) => { return x-y;})
+                  .forEach((pos) => {
+                  if(pos!=lastPos+1) posListQueue.push(-100);
+                  posListQueue.push(posListLookup[pos]);
+                  lastPos=pos;
+                });
+
+                var targetIndex = posListArray.length-1;
+                console.log("targeT");
+                console.log(targetIndex);
+                var curr=-100, smallCheck=0;
+                for(i in posListQueue){
+                  if(posListQueue[i]==0)
+                    curr=0;
+                  else if(curr+1==posListQueue[i])
+                    curr++;
+                  else curr=-100;
+                  if(curr==targetIndex){
+                    smallCheck=1;
+                    break;
+                  }
+                }
+
+                if(smallCheck==0) finalCheck=0;
+
+                console.log("queue");
+                console.log(posListQueue);
+
+              });
+
+              if(finalCheck==1) tempRankDocIDs.push(docID);
+            });
+
+            console.log("check2");
+            console.log(tempRankDocIDs);
+
+            mergedRankDocIDs = tempRankDocIDs.slice(0,limit);
+            console.log("newwwwwwwwwwwwwww");
+            console.log(mergedRankDocIDs);
+
 
             model.indexTable.page.getPages(mergedRankDocIDs)
               .then((pagesData) => {
