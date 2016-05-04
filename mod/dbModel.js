@@ -36,6 +36,7 @@ _schema.forwardTable = new Schema({
   docID: mongoose.Schema.ObjectId,
   words: [{
     wordID: mongoose.Schema.ObjectId,
+    wordPos: [{type: Number, min: 0}],
     freq: {type: Number, min: 0}
   }]
 });
