@@ -42,7 +42,7 @@ module.exports.find = (wordFreq, limit) => {   // wordFreq = {word: freq};
               var mtf=1;  // max(tf) - default to 1 which does make sense
 
               // Calculate mtf
-              for(i in word.docs) mtf=max(mtf, word.docs[i].freq);
+              for(i in word.docs) mtf=Math.max(mtf, word.docs[i].freq);
 
               word.docs.forEach((post) => {
                 var weight = post.freq*idf/mtf;   // tf&idf/max(tf) document weight
@@ -95,12 +95,10 @@ module.exports.find = (wordFreq, limit) => {   // wordFreq = {word: freq};
           // Sort mergedRankDocIDs desc
           mergedRankDocIDs.sort((doc1, doc2) => {   // [docID1, docID2 ....]
             return doc2.similarity-doc1.similarity;
-          }).map((doc) => {
-            return doc.docID;
           });
 
           return new Promise((resolve, reject) => {
-            resolve(mergedRankDocIDs.slice(0,limit));   // slice to top X documents, where X=limit
+            resolve(mergedRankDocIDs.map((doc) => { return doc.docID; }).slice(0,limit));   // slice to top X documents, where X=limit
           });
 
         }) // end:: found matching posts
