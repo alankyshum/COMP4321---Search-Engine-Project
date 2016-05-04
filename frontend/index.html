@@ -135,7 +135,8 @@
 						query.formDOM.classList.add('fadedOut');
 						result.DOM.classList.remove('typing');
 						break;
-					case 13: // end key
+					case 13: // enter key
+						query.suggestedWordDOM.innerHTML = "";
 						// animate input box
 						query.DOM.classList.add('shrinkToLoadingBar');
 						query.sound.play();
