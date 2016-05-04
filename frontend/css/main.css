@@ -149,6 +149,10 @@ body {
           transition: color .3s; }
     #results .resultItem .pageInfo {
       padding: 7px 15px; }
+      #results .resultItem .pageInfo div {
+        word-wrap: break-word;
+        font-family: monospace;
+        margin-bottom: 10px; }
       #results .resultItem .pageInfo .lastModifiedDate {
         text-align: right; }
       #results .resultItem .pageInfo .url {

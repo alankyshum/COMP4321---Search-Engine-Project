@@ -32,6 +32,11 @@
 				<div class="pageInfo">
 					<div class="lastModifiedDate"></div>
 					<div class="url"></div>
+					<div class="childLinks"></div>
+					<div class="parentLinks"></div>
+					<div class="wordFreq"></div>
+					<div class="pageSize"></div>
+					<div class="score"></div>
 				</div>
 			</div>
 		</template>
@@ -150,6 +155,11 @@
 						entry.querySelector('.pageTitle').textContent = datum.title;
 						entry.querySelector('.lastModifiedDate').textContent = (new Date(datum.lastModifiedDate)).toDateString();
 						entry.querySelector('.url').textContent = datum.url;
+						entry.querySelector('.childLinks').textContent = "Child Links: "+JSON.stringify(datum.childLinks);
+						entry.querySelector('.parentLinks').textContent = "Parent Links: "+JSON.stringify(datum.parentLinks);
+						entry.querySelector('.wordFreq').textContent = "Parent Links: "+JSON.stringify(datum.wordFreq.slice(0, 5));
+						entry.querySelector('.pageSize').textContent = "Size: "+datum.pageSize+"B";
+						entry.querySelector('.score').textContent = "Score: "+datum.score;
 
 						entry.querySelector('a.header').setAttribute('href', datum.url);
 						entry.querySelector('a.header').setAttribute('target', '_blank');

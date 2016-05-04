@@ -153,6 +153,11 @@ body {
     // end:: header
     .pageInfo {
       padding: 7px 15px;
+      div {
+        word-wrap: break-word;
+        font-family: monospace;
+        margin-bottom: 10px;
+      }
       .lastModifiedDate {
         text-align: right;
       }
