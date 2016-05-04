@@ -27,6 +27,7 @@
     #queryForm #query:focus {
       outline: none; }
     #queryForm #query.shrinkToLoadingBar {
+      min-width: 0;
       -webkit-animation: shrinkToLoadingBar ease-out 3s infinite;
               animation: shrinkToLoadingBar ease-out 3s infinite; }
   #queryForm #soundEffect {

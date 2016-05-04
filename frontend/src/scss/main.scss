@@ -38,6 +38,7 @@ $primaryBlue: #24A3D5;
       outline: none;
     }
     &.shrinkToLoadingBar {
+      min-width: 0; // for animation shrinking
       animation: shrinkToLoadingBar ease-out 3s infinite;
     }
   }
