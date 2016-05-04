@@ -95,6 +95,51 @@ body {
           transition: color .3s; }
     #results .resultItem .pageInfo {
       padding: 7px 15px; }
+      #results .resultItem .pageInfo .url {
+        width: 100%;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        color: #24A3D5;
+        font-weight: 300; }
+  #results #noResultMsg h2 {
+    font-size: 36px;
+    font-weight: 100;
+    color: white;
+    background-color: #24A3D5;
+    padding: 10px 80px; }
+    #results #noResultMsg h2:before {
+      content: "#_#";
+      margin-right: 30px;
+      font-size: 200%; }
+    #results #noResultMsg h2:after {
+      content: "What about trying another query?";
+      display: block;
+      margin-top: 20px;
+      text-align: right;
+      font-size: 30px;
+      font-weight: 500;
+      margin-bottom: -70px;
+      -webkit-animation: slideOpen 3s;
+              animation: slideOpen 3s;
+      -webkit-animation-fill-mode: forwards;
+              animation-fill-mode: forwards; }
+
+@-webkit-keyframes slideOpen {
+  0% {
+    margin-bottom: -70px; }
+  30% {
+    margin-bottom: -70px; }
+  100% {
+    margin-bottom: 15px; } }
+
+@keyframes slideOpen {
+  0% {
+    margin-bottom: -70px; }
+  30% {
+    margin-bottom: -70px; }
+  100% {
+    margin-bottom: 15px; } }
 
 #pagination {
   width: 70vw;

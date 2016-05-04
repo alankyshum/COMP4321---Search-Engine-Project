@@ -24,7 +24,10 @@
 					<div class="favIcon"></div>
 					<div class="pageTitle"></div>
 				</a>
-				<div class="pageInfo"></div>
+				<div class="pageInfo">
+					<div class="lastModifiedDate"></div>
+					<div class="url"></div>
+				</div>
 			</div>
 		</template>
 		<template id="pageBtnTemplate">
@@ -56,6 +59,12 @@
 				return Object.keys(JSONReq).map((key) => {
 					return `${encodeURIComponent(key)}=${encodeURIComponent(JSONReq[key])}`;
 				}).join('&');
+			}
+
+			var emptyChildren = (e) => {
+				while(e.lastElementChild) {
+					e.removeChild(e.lastElementChild);
+				}
 			}
 
 			// --------------
@@ -94,39 +103,49 @@
 
 			// RESULT RELATED -----------
 			result.buildDOM = (res) => {
-				// build results div
-				result.DOM.innerHTML = "";
-				res.data.forEach((datum) => {
-					var entry = document.importNode(result.template, true);
-					if (datum.favIcon) {
-						entry.querySelector('.favIcon').innerHTML = `<img src='${datum.favIcon}'/>`;
-					} else {
-						entry.querySelector('.favIcon').textContent = datum.title.substr(0, 1);
-					}
-					entry.querySelector('.pageTitle').textContent = datum.title;
-					var testString = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-					entry.querySelector('.pageInfo').textContent = testString.substr(0, Math.random()*testString.length)
-					entry.querySelector('.header').setAttribute('href', datum.url);
-					result.DOM.appendChild(entry);
-				})
+				if (!res.data.length) {
+					result.DOM.innerHTML =
+					`<div id="noResultMsg">
+						<h2>Sorry, no webpage matches</h2>
+					</div>`;
+					emptyChildren(result.paginationDOM);
+				} else {
+					// build results div
+					result.DOM.innerHTML = "";
+					res.data.forEach((datum) => {
+						var entry = document.importNode(result.template, true);
+						if (datum.favIconUrl.length) {
+							entry.querySelector('.favIcon').innerHTML = `<img src='${datum.favIconUrl}'/>`;
+						} else {
+							entry.querySelector('.favIcon').textContent = datum.title.substr(0, 1);
+						}
+						entry.querySelector('.pageTitle').textContent = datum.title;
+						entry.querySelector('.lastModifiedDate').textContent = (new Date(datum.lastModifiedDate)).toDateString();
+						entry.querySelector('.url').textContent = datum.url;
 
-				// build pageination buttons
-				result.paginationDOM.innerHTML = "";
-				var numPages = parseInt(res.querySummary.resultsCnt / 10) + 1;
-				var pageBtn = document.importNode(result.pageinationTemplate, true);
-				pageBtn.querySelector('.pageBtn').textContent = 1;
-				pageBtn.querySelector('.pageBtn').classList.add('active');
-				result.paginationDOM.appendChild(pageBtn);
-				for (var i = 2; i <= numPages; i++) {
-					pageBtn = document.importNode(result.pageinationTemplate, true);
-					pageBtn.querySelector('.pageBtn').textContent = i;
+						entry.querySelector('a.header').setAttribute('href', datum.url);
+						entry.querySelector('a.header').setAttribute('target', '_blank');
+						result.DOM.appendChild(entry);
+					})
+
+					// build pageination buttons
+					emptyChildren(result.paginationDOM);
+					var numPages = parseInt(res.querySummary.resultsCnt / 10) + 1;
+					var pageBtn = document.importNode(result.pageinationTemplate, true);
+					pageBtn.querySelector('.pageBtn').textContent = 1;
+					pageBtn.querySelector('.pageBtn').classList.add('active');
 					result.paginationDOM.appendChild(pageBtn);
+					for (var i = 2; i <= numPages; i++) {
+						pageBtn = document.importNode(result.pageinationTemplate, true);
+						pageBtn.querySelector('.pageBtn').textContent = i;
+						result.paginationDOM.appendChild(pageBtn);
+					}
 				}
-			}
+			} // end:: buildBOM
 
 			// KEY LISTENER -------------
 			var keyPressTimeBuffer;
-			document.onkeypress = (e) => {
+			document.onkeyup = (e) => {
 				query.DOM.focus();
 				result.DOM.classList.add('typing');
 				query.formDOM.classList.remove('fadedOut');
@@ -136,19 +155,17 @@
 						result.DOM.classList.remove('typing');
 						break;
 					case 13: // enter key
-						query.suggestedWordDOM.innerHTML = "";
+						emptyChildren(query.suggestedWordDOM);
 						// animate input box
 						query.DOM.classList.add('shrinkToLoadingBar');
 						query.sound.play();
 						// submit form
 						query.submit()
-						.then((data) => {
-							setTimeout(() => {
-								result.buildDOM(data);
-								query.DOM.classList.remove('shrinkToLoadingBar');
-								query.formDOM.classList.add('fadedOut');
-								result.DOM.classList.remove('typing');
-							}, 0);
+						.then((response) => {
+							result.buildDOM(response);
+							query.DOM.classList.remove('shrinkToLoadingBar');
+							query.formDOM.classList.add('fadedOut');
+							result.DOM.classList.remove('typing');
 						});
 						break;
 					default: // other keys
@@ -158,12 +175,14 @@
 							query.suggest(query.DOM.value)
 							.then((suggestedWords) => {
 								var wordOption;
-								query.suggestedWordDOM.innerHTML = "";
-								suggestedWords.forEach((word) => {
-									wordOption = document.createElement('option');
-									wordOption.value = word;
-									query.suggestedWordDOM.appendChild(wordOption)
-								})
+								emptyChildren(query.suggestedWordDOM);
+								if (!query.formDOM.classList.contains('fadedOut')) {
+									suggestedWords.forEach((word) => {
+										wordOption = document.createElement('option');
+										wordOption.value = word;
+										query.suggestedWordDOM.appendChild(wordOption)
+									})
+								}
 							})
 						}, 1000);
 						break;

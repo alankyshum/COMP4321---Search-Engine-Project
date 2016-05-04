@@ -111,9 +111,54 @@ body {
     // end:: header
     .pageInfo {
       padding: 7px 15px;
+      .url {
+        width: 100%;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        color: $primaryBlue;
+        font-weight: 300;
+      }
+    }
+  }
+  #noResultMsg {
+    h2 {
+      font-size: 36px;
+      font-weight: 100;
+      color: white;
+      background-color: $primaryBlue;
+      padding: 10px 80px;
+      &:before {
+        content: "#_#";
+        margin-right: 30px;
+        font-size: 200%;
+      }
+      &:after {
+        content: "What about trying another query?";
+        display: block;
+        margin-top: 20px;
+        text-align: right;
+        font-size: 30px;
+        font-weight: 500;
+        margin-bottom: -70px;
+        animation: slideOpen 3s;
+        animation-fill-mode: forwards;
+      }
     }
   }
 }
+@keyframes slideOpen {
+  0% {
+    margin-bottom: -70px;
+  }
+  30% {
+    margin-bottom: -70px;
+  }
+  100% {
+    margin-bottom: 15px;
+  }
+}
+
 #pagination {
   width: 70vw;
   margin: 30px auto 20px auto;
