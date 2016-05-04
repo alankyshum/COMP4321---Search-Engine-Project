@@ -4,10 +4,17 @@
  * SEARCH ITEM FROM THE SERVER
  */
 const model = require('./model')
-  , colors = require('colors');
-const config = require('../config.json');
+  , colors = require('colors')
+  , config = require('../config.json')
+  , cache = require('memory-cache');
 
 module.exports.find = (wordFreq, limit) => {   // wordFreq = {word: freq};
+
+  // STORING BASIC INFORMATION OF QUERY RESULTS
+  var queryStat = {
+    startTime: new Date(),
+    totalQueryResults: 0
+  }
 
   // Compute queryNorm (without sqrt)
   var queryNorm = Object.keys(wordFreq).reduce((acc, value) => { return acc+wordFreq[value]*wordFreq[value];},0);
@@ -98,6 +105,7 @@ module.exports.find = (wordFreq, limit) => {   // wordFreq = {word: freq};
           });
 
           return new Promise((resolve, reject) => {
+            queryStat.totalQueryResults = mergedRankDocIDs.length;
             resolve(mergedRankDocIDs.map((doc) => { return doc.docID; }).slice(0,limit));   // slice to top X documents, where X=limit
           });
 
@@ -168,8 +176,8 @@ module.exports.find = (wordFreq, limit) => {   // wordFreq = {word: freq};
                 resolve({
                   data: finalPagesRank,
                   querySummary: {
-                    time: '0.01s',
-                    resultsCnt: 230
+                    time: (new Date() - queryStat.startTime)/1000,
+                    resultsCnt: queryStat.totalQueryResults
                   }
                 });
 

@@ -35,7 +35,7 @@ if (cluster.isMaster) {
 
   app.use(express.static(`${__dirname}/frontend`));
   app.get('/query', (req, res) => {
-    console.log(`[SERVER] GETTING SEARCH RESULTS OF "${req.query.s}"`);
+    console.log(`[SERVER] GETTING SEARCH RESULTS OF "${req.query.s}"`.green);
     search.find(model.words.wordFreq(req.query.s), config.maxRankPages)
     .then((results) => {
       res.setHeader('Content-Type', 'application/json');
@@ -43,7 +43,7 @@ if (cluster.isMaster) {
     });
   });
   app.get('/word', (req, res) => {
-    console.log(`[SERVER] GETTING SEARCH SUGGESTIONS OF "${req.query.s}"`);
+    console.log(`[SERVER] GETTING SEARCH SUGGESTIONS OF "${req.query.s}"`.green);
     search.wordSuggest(req.query.s)
     .then((results) => {
       res.setHeader('Content-Type', 'application/json');
