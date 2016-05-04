@@ -2,7 +2,7 @@
   "rootURL": "http://www.cse.ust.hk/~ericzhao/COMP4321/TestPages/testpage.htm",
   "mongoDB": "mongodb://localhost:27017/comp4321",
   "resultFile": "spider_result.txt",
-  "maxPages": 10,
+  "maxPages": 300,
   "crawlTimeOut": 2500,
   "bulkWindow": 100,
   "maxRankPages": 50,
