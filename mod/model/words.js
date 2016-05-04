@@ -16,6 +16,8 @@ module.exports.is = is;
 
 // RETURN LIST OF NON-STOPWORD + STEMMED WORDS
 var getSearchables = (wordList) => {
+  wordList = wordList.map((word) => { return word.toLowerCase(); });  // search "getting" in frontend, you will know why (with and without this line)
+  
 	return wordList.filter((word) => {
 		return !is(word)
 	}).map((word) => {
@@ -37,4 +39,31 @@ var wordFreq = (body) => {
 	})
 	return wordFreq;
 }
+
+var startIndex = 0;
+var wordPosHelper = (wordString, wordPos) => {
+  var wordList = wordString.match(/\w+/g); // match word
+  
+  if(wordList==null) return {};
+  
+  getSearchables(wordList).forEach((word) => {
+		if (!wordPos[word]) wordPos[word]=[startIndex];
+    else wordPos[word].push(startIndex);
+    ++startIndex;
+	});
+  
+  return wordPos;
+}
+
+var wordPos = (title, body) => {
+  var wordPos = {};   // {word: [pos1, pos2, pos3, ...]}
+  
+  startIndex = 0;
+  wordPos = wordPosHelper(title,wordPos);
+  ++startIndex;  // prevent title last word and body first word, being treated as neighbour!
+  wordPos = wordPosHelper(body,wordPos);
+  return wordPos;
+}
+
 module.exports.wordFreq = wordFreq;
+module.exports.wordPos = wordPos;

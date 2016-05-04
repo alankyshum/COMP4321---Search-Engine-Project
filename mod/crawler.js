@@ -53,7 +53,8 @@ module.exports.extractLinks = (link) => {
 					childLinks: Array.from(linkSet),   // [need review] child link needs to be inserted
           wordFreqTitle: $('title').text()?model.words.wordFreq($('title').text()):{},
 					wordFreqBody: $('body').text()?model.words.wordFreq($('body').text()):{},
-          wordFreq: $('body, title').text()?model.words.wordFreq($('body, title').text()):{}
+          wordFreq: $('body, title').text()?model.words.wordFreq($('body, title').text()):{},   // {word: freq}
+          wordPos: $('body, title').text()?model.words.wordPos($('title').text(), $('body').text()):{}  // {word: [pos1, pos2, pos3, ...]}
 				});
       });
 
