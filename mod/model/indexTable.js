@@ -112,7 +112,7 @@ module.exports.page = (() => {
         url: page.url,
         lastModifiedDate: page.lastModifiedDate,
         lastCrawlDate: page.lastCrawlDate,
-        size: page.pageSize,
+        size: parseInt(page.pageSize),
         childLinks: page.childLinks
       };
       dbModel.pageInfo.update({
@@ -142,7 +142,7 @@ module.exports.page = (() => {
           favIconUrl: page.favIconUrl,
           lastModifiedDate: page.lastModifiedDate,
           lastCrawlDate: page.lastCrawlDate,
-          size: page.pageSize,
+          size: parseInt(page.pageSize),
           childLinks: page.childLinks
         });
       }) // end: forEach
@@ -246,9 +246,9 @@ module.exports.forward = (() => {
     return new Promise((resolve, reject) => {
 
       dbModel.forwardTable.update({
-        docID: id
+        docID: new ObjectIdType(id)
       }, {
-        docID: id,
+        docID: new ObjectIdType(id),
         $addToSet: { words: { $each: wordFreqArray } }
       }, {upsert: true}, (err, raw) => {
         if (err) {console.error(err); reject(err);}
@@ -268,7 +268,7 @@ module.exports.forward = (() => {
       var bulk = dbModel.forwardTable.collection.initializeUnorderedBulkOp();
       try {
         Object.keys(pageWordTable).forEach((id) => {
-          bulk.find({docID: id}).upsert().updateOne({
+          bulk.find({docID: new ObjectIdType(id)}).upsert().updateOne({
             $addToSet: {words: {$each: pageWordTable[id].IDToWordFreqArray}}
           })
         })
@@ -333,8 +333,8 @@ module.exports.inverted = (() => {
       Object.keys(wordFreqTitle).forEach((key) => {
         var _logHead = "[MODEL/INDEXTABLE/INVERTEDTITLE/UPSERT]";
         dbModel.invertedTableTitle.update({
-          wordID: key,
-          "docs.docID": id
+          wordID: new ObjectIdType(key),
+          "docs.docID": new ObjectIdType(id)
         }, {
           $set: { "docs.$.freq": wordFreqTitle[key] }
         }, (err, raw) => {
@@ -342,7 +342,7 @@ module.exports.inverted = (() => {
           else {
             if(!raw.nMatched)
               dbModel.invertedTableTitle.update({
-                wordID: key
+                wordID: new ObjectIdType(key)
               }, {
                 $addToSet: { docs: { docID: id, freq: wordFreqTitle[key]} }
               }, {upsert: true}, (err, raw) => {
@@ -364,8 +364,8 @@ module.exports.inverted = (() => {
       Object.keys(wordFreqBody).forEach((key) => {
         var _logHead = "[MODEL/INDEXTABLE/INVERTEDBODY/UPSERT]";
         dbModel.invertedTableBody.update({
-          wordID: key,
-          "docs.docID": id
+          wordID: new ObjectIdType(key),
+          "docs.docID": new ObjectIdType(id)
         }, {
           $set: { "docs.$.freq": wordFreqBody[key] }
         }, (err, raw) => {
@@ -373,7 +373,7 @@ module.exports.inverted = (() => {
           else {
             if(!raw.nMatched)
               dbModel.invertedTableBody.update({
-                wordID: key
+                wordID: new ObjectIdType(key)
               }, {
                 $addToSet: { docs: { docID: id, freq: wordFreqBody[key]} }
               }, {upsert: true}, (err, raw) => {
@@ -406,7 +406,7 @@ module.exports.inverted = (() => {
         }).upsert().updateOne({
           "$addToSet": {
             docs: {
-              docID: id,
+              docID: new ObjectIdType(id),
               freq: pageWordTable[id].IDToWordFreqTitle[key]
             }
           }
@@ -418,7 +418,7 @@ module.exports.inverted = (() => {
         }).upsert().updateOne({
           "$addToSet": {
             docs: {
-              docID: id,
+              docID: new ObjectIdType(id),
               freq: pageWordTable[id].IDToWordFreqBody[key]
             }
           }
