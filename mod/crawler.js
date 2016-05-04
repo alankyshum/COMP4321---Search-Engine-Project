@@ -37,6 +37,13 @@ module.exports.extractLinks = (link) => {
 
       res.on('end', () => {
         var $ = cheerio.load(decoder.write(data));
+        
+        var body = $("body").html($("body").html().replace(/<br\s*[\/]?>/gi, "\n")).text();
+       // console.log(body);
+        var title = $("title").html($("title").html().replace(/<br\s*[\/]?>/gi, "\n")).text();
+        var bodyTitle = body.concat(title);
+        
+        
 				$('a[href]').each((a_i, a) => {
 					linkSet.add(url.resolve(link, $(a).attr('href')));
 			 	});
@@ -51,10 +58,10 @@ module.exports.extractLinks = (link) => {
 					lastCrawlDate: new Date(),
 					pageSize: res.headers["content-length"] || data.length,
 					childLinks: Array.from(linkSet),   // [need review] child link needs to be inserted
-          wordFreqTitle: $('title').text()?model.words.wordFreq($('title').text()):{},
-					wordFreqBody: $('body').text()?model.words.wordFreq($('body').text()):{},
-          wordFreq: $('body, title').text()?model.words.wordFreq($('body, title').text()):{},   // {word: freq}
-          wordPos: $('body, title').text()?model.words.wordPos($('title').text(), $('body').text()):{}  // {word: [pos1, pos2, pos3, ...]}
+          wordFreqTitle: title?model.words.wordFreq(title):{},
+					wordFreqBody: body?model.words.wordFreq(body):{},
+          wordFreq: bodyTitle?model.words.wordFreq(bodyTitle):{},   // {word: freq}
+          wordPos: bodyTitle?model.words.wordPos(title, body):{}  // {word: [pos1, pos2, pos3, ...]}
 				});
       });
 
