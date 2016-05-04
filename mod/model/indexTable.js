@@ -2,6 +2,7 @@ const dbModel = require('../dbModel')
   , colors = require('colors')
   , config = require('../../config.json')
   , error = require('../error');
+const ObjectIdType = require('mongoose').Types.ObjectId;
 /**
  * MODULE:: FORWARD + INVERTED INDEX
  * --------------------------
@@ -76,6 +77,23 @@ module.exports.word = (() => {
         resolve(word.word);
       })
     })
+  }
+
+  returnFx.getSimilarWords = (word, idOnly) => {
+    return new Promise((resolve, reject) => {
+      if (word.length < config.suggestWordMinLength) {
+        resolve();
+      } else {
+        try {
+          dbModel.wordList.find({
+            word: new RegExp(`^\\b${word}.{0,5}\\b`, 'i')
+          }, idOnly?'_id':'', (err, words) => {
+            if (err) {console.error(err); resolve();}
+            resolve(words);
+          })
+        } catch (e) {console.error(e);}
+      }
+    });
   }
 
   return returnFx;
@@ -384,7 +402,7 @@ module.exports.inverted = (() => {
     Object.keys(pageWordTable).forEach((id) => {
       Object.keys(pageWordTable[id].IDToWordFreqTitle).forEach((key) => {
         bulk_title.find({
-          wordID: key
+          wordID: new ObjectIdType(key)
         }).upsert().updateOne({
           "$addToSet": {
             docs: {
@@ -396,7 +414,7 @@ module.exports.inverted = (() => {
       })
       Object.keys(pageWordTable[id].IDToWordFreqBody).forEach((key) => {
         bulk_body.find({
-          wordID: key
+          wordID: new ObjectIdType(key)
         }).upsert().updateOne({
           "$addToSet": {
             docs: {
@@ -444,13 +462,35 @@ module.exports.inverted = (() => {
 
   returnFx.getWordPostings = ((wordIDList, findTitle, limit) => {   // [listNum] true: Title, false: Body
     // default parameter (limit)
-    var query = typeof limit===undefined?{wordID: {$in: wordIDList} }:{wordID: {$in: wordIDList}, docs: {$slice: limit} };
     return new Promise((resolve, reject) => {
-      dbModel[findTitle?"invertedTableTitle":"invertedTableBody"].find(query, 'wordID docs', (err, postings) => {
-        console.log("DONE SEARCHING DOCUMENTS");
-        if (err) {console.error(err); return reject(err);}
-        resolve(postings);
-      });
+      try {
+        dbModel[findTitle?"invertedTableTitle":"invertedTableBody"]
+        .find({ wordID: {$in: wordIDList} })
+        .select('-_id wordID docs')
+        .limit(limit?limit:10)
+        .exec((err, postings) => {
+          console.log(`DONE SEARCHING DOCUMENTS [${findTitle?"INVERTED_TABLE::TITLE":"INVERTED_TABLE::BODY"}]`);
+          if (err) {console.error(err); return reject(err);}
+          resolve(postings);
+        });
+      } catch (e) {console.error(e);}
+    });
+  });
+
+  returnFx.getWordFreq = ((wordIDList, findTitle, limit) => {   // [listNum] true: Title, false: Body
+    // default parameter (limit)
+    return new Promise((resolve, reject) => {
+      try {
+        dbModel.invertedTableBody
+        .find({ 'wordID': {$in: wordIDList} })
+        .select('-_id wordID docs.freq')
+        .limit(limit?limit:50)
+        .exec((err, postings) => {
+          console.log(`DONE SEARCHING DOCUMENTS [${findTitle?"INVERTED_TABLE::TITLE":"INVERTED_TABLE::BODY"}]`);
+          if (err) {console.error(err); return reject(err);}
+          resolve(postings);
+        });
+      } catch (e) {console.error(e);}
     });
   });
 

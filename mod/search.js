@@ -184,3 +184,31 @@ module.exports.find = (wordFreq, limit) => {   // wordFreq = {word: freq};
     })
   }) // end:: root promise
 }
+
+
+module.exports.wordSuggest = (word) => {
+  return model.indexTable.word.getSimilarWords(word)
+  .then((wordIDList) => {
+    var idToWordList = {};
+    wordIDList.forEach((wordID) => {
+      idToWordList[wordID._id] = wordID.word;
+    })
+    model.indexTable.inverted.getWordFreq(Object.keys(idToWordList), false)
+    .then((docList) => {
+      var wordToFreq = {};
+      console.log(docList);
+      docList.forEach((doc) => {
+        if (!wordToFreq[idToWordList[doc.wordID]]) wordToFreq[idToWordList[doc.wordID]] = 0;
+        doc.docs.forEach((docInfo) => {
+          wordToFreq[idToWordList[doc.wordID]] += docInfo.freq;
+        })
+      })
+      var sortedWords = Object.keys(wordToFreq).sort((word1, word2) => {
+        return wordToFreq[word1] < wordToFreq[word2] // lower freq --> swap --> desc
+      })
+      return new Promise((resolve, reject) => {
+        resolve(sortedWords);
+      })
+    })
+  })
+}
