@@ -99,6 +99,8 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
               similarity: (rankDocIDs.title[docID]===undefined?0:rankDocIDs.title[docID])*config.titleWeight+
                           (rankDocIDs.body[docID]===undefined?0:rankDocIDs.body[docID])*(1-config.titleWeight)
             });
+            console.log((rankDocIDs.title[docID]===undefined?0:rankDocIDs.title[docID])*config.titleWeight+
+                          (rankDocIDs.body[docID]===undefined?0:rankDocIDs.body[docID])*(1-config.titleWeight));
           });
 
 
@@ -109,11 +111,18 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
           return new Promise((resolve, reject) => {
             queryStat.totalQueryResults = mergedRankDocIDs.length;
-            resolve(mergedRankDocIDs.map((doc) => { return doc.docID; }).slice(0,limit));   // slice to top X documents, where X=limit
+            resolve(mergedRankDocIDs);   // slice to top X documents, where X=limit
           });
 
         }) // end:: found matching posts
         .then((mergedRankDocIDs) => {
+          
+          var finalSimilarity={};
+          mergedRankDocIDs.forEach((doc) => { finalSimilarity[doc.docID]=doc.similarity; });
+          mergedRankDocIDs = mergedRankDocIDs.map((doc) => { return doc.docID; }).slice(0,limit);
+          
+          
+          
           console.log(`[SEARCHING] MATCH DOC TITLE:ID\t${mergedRankDocIDs}`.yellow);
 
           model.indexTable.forward.getDocsList(mergedRankDocIDs)  // [{docID: X, words: [{ wordID: X, freq: X, wordPos: X}, ...] }, ...]
@@ -129,20 +138,20 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 phraseLookup[posting.docID][word.wordID]=word.wordPos;
               });
             });
-            console.log(phraseLookup);
-            console.log('check1');
+            //console.log(phraseLookup);
+           // console.log('check1');
 
             // Phrase handling
             Object.keys(wordPhrase).forEach((phrase) => {
               wordPhrase[phrase] = wordPhrase[phrase].map((word) => { return wordToWordIDLookup[word]; });
             });
-            console.log(wordPhrase);
+            //console.log(wordPhrase);
 
             // Direct filter out documents do not contain phrase
             var tempRankDocIDs=[];
             mergedRankDocIDs.forEach((docID) => {
 
-              console.log(docID);
+              //console.log(docID);
 
               var finalCheck = 1;
               Object.keys(wordPhrase).forEach((phrase) => {
@@ -153,8 +162,8 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                   else posListArray.push([]);
                 });
 
-                console.log("check mid");
-                console.log(posListArray);
+               // console.log("check mid");
+                //console.log(posListArray);
 
                 var posListLookup = {}; // {pos: wordIndex}
                 var posListQueue = []; // posListQueue = [wordID1, wordID2, ..... ]
@@ -164,8 +173,8 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                   });
                 });
 
-                console.log("check mid2");
-                console.log(posListLookup);
+                //console.log("check mid2");
+                //console.log(posListLookup);
 
                 var lastPos=-100;
                 Object.keys(posListLookup).map((s) => { return parseInt(s); }).sort((x,y) => { return x-y;})
@@ -176,8 +185,8 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 });
 
                 var targetIndex = posListArray.length-1;
-                console.log("targeT");
-                console.log(targetIndex);
+                //console.log("targeT");
+                //console.log(targetIndex);
                 var curr=-100, smallCheck=0;
                 for(i in posListQueue){
                   if(posListQueue[i]==0)
@@ -193,20 +202,21 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
                 if(smallCheck==0) finalCheck=0;
 
-                console.log("queue");
-                console.log(posListQueue);
+                //console.log("queue");
+                //console.log(posListQueue);
 
               });
 
               if(finalCheck==1) tempRankDocIDs.push(docID);
             });
 
-            console.log("check2");
-            console.log(tempRankDocIDs);
+            //console.log("check2");
+            //console.log(tempRankDocIDs);
 
             mergedRankDocIDs = tempRankDocIDs.slice(0,limit);
-            console.log("newwwwwwwwwwwwwww");
+            //console.log("newwwwwwwwwwwwwww");
             console.log(mergedRankDocIDs);
+            console.log(finalSimilarity);
 
 
             model.indexTable.page.getPages(mergedRankDocIDs)
@@ -240,6 +250,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 pagesData.forEach((page) => {
 
                   pagesLookup[page._id] = {
+                    score: finalSimilarity[page._id],
                     title: page.title,
                     url: page.url,
                     favIconUrl: page.favIconUrl,
@@ -248,7 +259,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                     pageSize: page.size,
                     parentLinks: parentsLookup[page._id],   // [1st piece]
                     childLinks: page.childLinks,
-                    wordFreq: wordsLookup[page._id]         // [2nd piece]
+                    wordFreq: wordsLookup[page._id].sort((word1, word2) => { return word2.freq-word1.freq; }).slice(0,5)         // [2nd piece]
                   };
 
                 });
