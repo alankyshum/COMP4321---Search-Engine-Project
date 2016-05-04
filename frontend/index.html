@@ -49,13 +49,17 @@
 				formDOM: document.getElementById('queryForm'),
 				suggestedWordDOM: document.getElementById('suggestedWords'),
 				sound: document.getElementById('soundEffect'),
-				summaryDOM: document.getElementById('querySummary')
+				summaryDOM: document.getElementById('querySummary'),
 			};
 			var result = {
 				DOM: document.getElementById('results'),
 				template: document.getElementById('resultTemplate').content,
 				paginationDOM: document.getElementById('pagination'),
-				pageinationTemplate: document.getElementById('pageBtnTemplate').content
+				pageinationTemplate: document.getElementById('pageBtnTemplate').content,
+				limit: 10,
+				currentPage: 1,
+				cache: null, // cor caching results from server
+				summary: {}
 			}
 
 			// -------------------
@@ -108,7 +112,21 @@
 			}
 
 			// RESULT RELATED -----------
-			result.buildDOM = (res) => {
+			result.switchPage = (num) => {
+				var startPos = (num-1)*result.limit;
+				result.buildDOM({
+					data: result.cache.data.slice(startPos, startPos+result.limit),
+					querySummary: result.cache.querySummary
+				}, true);
+			}
+			var switchPageAction = (e, num) => {
+				result.paginationDOM.querySelector('.active') && result.paginationDOM.querySelector('.active').classList.toggle('active');
+				e.classList.toggle('active');
+				result.currentPage = num;
+				result.switchPage(num);
+			}
+
+			result.buildDOM = (res, pageResultsOnly) => {
 				if (!res.data.length) {
 					result.DOM.innerHTML =
 					`<div id="noResultMsg">
@@ -119,7 +137,10 @@
 				} else {
 					// build results div
 					result.DOM.innerHTML = "";
-					res.data.forEach((datum) => {
+					for (var i = 0; i < result.limit; i++) {
+						var datum = res.data[i];
+						if (!datum) continue;
+
 						var entry = document.importNode(result.template, true);
 						if (datum.favIconUrl.length) {
 							entry.querySelector('.favIcon').innerHTML = `<img src='${datum.favIconUrl}'/>`;
@@ -133,25 +154,27 @@
 						entry.querySelector('a.header').setAttribute('href', datum.url);
 						entry.querySelector('a.header').setAttribute('target', '_blank');
 						result.DOM.appendChild(entry);
-					})
-
-					// build pageination buttons
-					emptyChildren(result.paginationDOM);
-					var numPages = parseInt(res.querySummary.resultsCnt / 10) + 1;
-					var pageBtn = document.importNode(result.pageinationTemplate, true);
-					pageBtn.querySelector('.pageBtn').textContent = 1;
-					pageBtn.querySelector('.pageBtn').classList.add('active');
-					result.paginationDOM.appendChild(pageBtn);
-					for (var i = 2; i <= numPages; i++) {
-						pageBtn = document.importNode(result.pageinationTemplate, true);
-						pageBtn.querySelector('.pageBtn').textContent = i;
-						result.paginationDOM.appendChild(pageBtn);
 					}
 
-					// query summary
-					query.summaryDOM.classList.remove('hidden');
-					query.summaryDOM.querySelector('.queryTime').textContent = res.querySummary.time;
-					query.summaryDOM.querySelector('.numResults').textContent = res.querySummary.resultsCnt;
+					if (!pageResultsOnly) {
+						// build pageination buttons
+						emptyChildren(result.paginationDOM);
+						var numPages = parseInt(res.querySummary.resultsCnt / result.limit) + 1;
+						var pageBtn;
+						for (var i = 1; i <= numPages; i++) {
+							pageBtn = document.importNode(result.pageinationTemplate, true);
+							pageBtn.querySelector('.pageBtn').textContent = i;
+							result.paginationDOM.appendChild(pageBtn);
+							result.paginationDOM.lastElementChild.setAttribute('onclick', `switchPageAction(this, ${i});`);
+						}
+						result.paginationDOM.children[result.currentPage-1].classList.add('active');
+
+						// query summary
+						query.summaryDOM.classList.remove('hidden');
+						query.summaryDOM.querySelector('.queryTime').textContent = res.querySummary.time;
+						query.summaryDOM.querySelector('.numResults').textContent = res.querySummary.resultsCnt;
+						result.summary = res.querySummary;
+					}
 
 				} // end:: with results
 			} // end:: buildBOM
@@ -175,6 +198,7 @@
 						// submit form
 						query.submit()
 						.then((response) => {
+							result.cache = response;
 							result.buildDOM(response);
 							query.DOM.classList.remove('shrinkToLoadingBar');
 							query.formDOM.classList.add('fadedOut');
