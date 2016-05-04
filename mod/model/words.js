@@ -16,6 +16,8 @@ module.exports.is = is;
 
 // RETURN LIST OF NON-STOPWORD + STEMMED WORDS
 var getSearchables = (wordList) => {
+  wordList = wordList.map((word) => { return word.toLowerCase(); });
+  
 	return wordList.filter((word) => {
 		return !is(word)
 	}).map((word) => {
