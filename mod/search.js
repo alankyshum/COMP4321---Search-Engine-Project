@@ -46,8 +46,10 @@ module.exports.find = (wordFreq, limit) => {   // wordFreq = {word: freq};
 
               word.docs.forEach((post) => {
                 var weight = post.freq*idf/mtf;   // tf&idf/max(tf) document weight
-                if(docs[post.docID]===undefined) docs[post.docID]={word.wordID: weight};
-                else docs[post.docID][word.wordID]=weight;
+                if (!docs[post.docID])
+                  docs[post.docID] = { [word.wordID]: weight };
+                else
+                  docs[post.docID][word.wordID] = weight;
               });
             });
 
