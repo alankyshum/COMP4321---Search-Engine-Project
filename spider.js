@@ -51,18 +51,19 @@ var bulkOps = (cacheIndex) => {
 			};
 			Object.keys(page.wordFreqTitle).forEach((key) => {
 				pageWordTable[urlToID[page.url]].IDToWordFreqTitle[wordToID[key]] = page.wordFreqTitle[key];
-				pageWordTable[urlToID[page.url]].IDToWordFreqArray.push({
-					wordID: wordToID[key],
-					freq: page.wordFreqTitle[key]
-				});
 			});
 			Object.keys(page.wordFreqBody).forEach((key) => {
 				pageWordTable[urlToID[page.url]].IDToWordFreqBody[wordToID[key]] = page.wordFreqBody[key];
-				pageWordTable[urlToID[page.url]].IDToWordFreqArray.push({
-					wordID: wordToID[key],
-					freq: page.wordFreqBody[key]
-				});
 			});
+      Object.keys(page.wordFreq).forEach((key) => {
+        pageWordTable[urlToID[page.url]].IDToWordFreqArray.push({
+					wordID: wordToID[key],
+					freq: page.wordFreq[key],
+          wordPos: page.wordPos[key]
+				});
+      });
+
+      
 		}); // end:: loop page --> prepare wordFreqTable
 
 		// WRITE TO DATABASE
