@@ -157,7 +157,8 @@
 						entry.querySelector('.url').textContent = datum.url;
 						entry.querySelector('.childLinks').textContent = "Child Links: "+JSON.stringify(datum.childLinks);
 						entry.querySelector('.parentLinks').textContent = "Parent Links: "+JSON.stringify(datum.parentLinks);
-						entry.querySelector('.wordFreq').textContent = "Parent Links: "+JSON.stringify(datum.wordFreq.slice(0, 5));
+
+						entry.querySelector('.wordFreq').textContent = "Word Freq: "+JSON.stringify(datum.wordFreq.slice(0, 5));
 						entry.querySelector('.pageSize').textContent = "Size: "+datum.pageSize+"B";
 						entry.querySelector('.score').textContent = "Score: "+datum.score;
 
