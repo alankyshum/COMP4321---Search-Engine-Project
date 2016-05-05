@@ -117,6 +117,31 @@
 			}
 
 			// RESULT RELATED -----------
+			result.generateList = (targetDiv, data, type, title) => {
+				var li;
+				var ol = document.createElement('ol');
+				if (type == "object") {
+					data.forEach((datum) => {
+						li = document.createElement('li');
+						Object.keys(datum).forEach((key) => {
+							li.textContent += `[${key}] ${datum[key]}; `;
+						});
+						ol.appendChild(li);
+					});
+				} else if (type == "array") {
+					data.forEach((datum) => {
+						li = document.createElement('li');
+						li.textContent = datum;
+						ol.appendChild(li);
+					})
+				}
+				var span = document.createElement('span');
+				span.textContent = title;
+				span.classList.add('dataTitle');
+				targetDiv.appendChild(span);
+				targetDiv.appendChild(ol);
+			}
+
 			result.switchPage = (num) => {
 				var startPos = (num-1)*result.limit;
 				result.buildDOM({
@@ -155,12 +180,13 @@
 						entry.querySelector('.pageTitle').textContent = datum.title;
 						entry.querySelector('.lastModifiedDate').textContent = (new Date(datum.lastModifiedDate)).toDateString();
 						entry.querySelector('.url').textContent = datum.url;
-						entry.querySelector('.childLinks').textContent = "Child Links: "+JSON.stringify(datum.childLinks);
-						entry.querySelector('.parentLinks').textContent = "Parent Links: "+JSON.stringify(datum.parentLinks);
 
-						entry.querySelector('.wordFreq').textContent = "Word Freq: "+JSON.stringify(datum.wordFreq.slice(0, 5));
-						entry.querySelector('.pageSize').textContent = "Size: "+datum.pageSize+"B";
-						entry.querySelector('.score').textContent = "Score: "+datum.score;
+						result.generateList(entry.querySelector('.childLinks'), datum.childLinks, "array", "Child Links");
+						result.generateList(entry.querySelector('.parentLinks'), datum.parentLinks, "array", "Parent Links");
+						result.generateList(entry.querySelector('.wordFreq'), datum.wordFreq.slice(0, 5), "object", "Word Freq");
+
+						entry.querySelector('.pageSize').innerHTML = `<span class='dataTitle-inline'>Size: </span> ${datum.pageSize}B`; "Size: "+datum.pageSize+"B";
+						entry.querySelector('.score').innerHTML = `<span class='dataTitle-inline'>Score: </span> ${datum.score}`;
 
 						entry.querySelector('a.header').setAttribute('href', datum.url);
 						entry.querySelector('a.header').setAttribute('target', '_blank');
@@ -196,7 +222,6 @@
 				query.DOM.focus();
 				result.DOM.classList.add('typing');
 				query.formDOM.classList.remove('fadedOut');
-				console.log(e.keyCode);
 				switch (e.keyCode) {
 					case 27: // esc key
 						query.formDOM.classList.add('fadedOut');
