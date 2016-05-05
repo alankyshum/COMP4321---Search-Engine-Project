@@ -196,6 +196,7 @@
 				query.DOM.focus();
 				result.DOM.classList.add('typing');
 				query.formDOM.classList.remove('fadedOut');
+				console.log(e.keyCode);
 				switch (e.keyCode) {
 					case 27: // esc key
 						query.formDOM.classList.add('fadedOut');
@@ -215,6 +216,16 @@
 							query.formDOM.classList.add('fadedOut');
 							result.DOM.classList.remove('typing');
 						});
+						break;
+					// some function keys
+					case 38: // up
+					case 38: // left
+					case 40: // right
+					case 40: // down
+					case 17: // control
+					case 18: // option
+					case 91: // command left
+					case 93: // command right
 						break;
 					default: // other keys
 						if (query.DOM.value.length+1 <= 3) break; // +1 for the delay
