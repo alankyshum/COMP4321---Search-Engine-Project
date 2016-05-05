@@ -230,6 +230,7 @@
 					default: // other keys
 						if (query.DOM.value.length+1 <= 3) break; // +1 for the delay
 						clearTimeout(keyPressTimeBuffer);
+						result.currentPage = 1;
 						keyPressTimeBuffer = setTimeout(() => {
 							query.suggest(query.DOM.value)
 							.then((suggestedWords) => {
