@@ -116,16 +116,46 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
         }) // end:: found matching posts
         .then((mergedRankDocIDs) => {
-          
+
           var finalSimilarity={};
           mergedRankDocIDs.forEach((doc) => { finalSimilarity[doc.docID]=doc.similarity; });
           mergedRankDocIDs = mergedRankDocIDs.map((doc) => { return doc.docID; }).slice(0,limit);
-          
-          
-          
+
+
+
           console.log(`[SEARCHING] MATCH DOC TITLE:ID\t${mergedRankDocIDs}`.yellow);
 
           model.indexTable.forward.getDocsList(mergedRankDocIDs)  // [{docID: X, words: [{ wordID: X, freq: X, wordPos: X}, ...] }, ...]
+          .then((wordsData) => {
+            return new Promise((resolve, reject) => {
+              var idList = [];
+              wordsData.forEach((posting) => {
+                posting.words.forEach((wordObj) => {
+                  idList.push(wordObj.wordID)
+                })
+              });
+              model.indexTable.word.getIDWord(idList)
+              .then((wordObj) => {
+                var idToWord = {};
+                wordObj.forEach((w) => {
+                  idToWord[w._id] = w.word;
+                });
+                wordsData = wordsData.map((posting) => {
+                  return {
+                    docID: posting.docID,
+                    words: posting.words.map((wordObj) => {
+                      return {
+                        wordID: wordObj.wordID,
+                        freq: wordObj.freq,
+                        word: idToWord[wordObj.wordID]
+                      }
+                    })
+                  }
+                })
+                resolve(wordsData);
+              })
+            })
+          })
           .then((wordsData) => {
 
             // Call it [2nd piece] that will be used in final process

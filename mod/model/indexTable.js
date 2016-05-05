@@ -79,6 +79,15 @@ module.exports.word = (() => {
     })
   }
 
+  returnFx.getIDWord = (idList) => {
+    return new Promise((resolve, reject) => {
+      dbModel.wordList.find({_id: {$in: idList}}, (err, words) => {
+        if (err) {console.error(err); reject(err)}
+        resolve(words);
+      })
+    })
+  }
+
   returnFx.getSimilarWords = (word, idOnly) => {
     return new Promise((resolve, reject) => {
       if (word.length < config.suggestWordMinLength) {

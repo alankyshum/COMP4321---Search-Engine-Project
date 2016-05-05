@@ -183,7 +183,8 @@
 
 						result.generateList(entry.querySelector('.childLinks'), datum.childLinks, "array", "Child Links");
 						result.generateList(entry.querySelector('.parentLinks'), datum.parentLinks, "array", "Parent Links");
-						result.generateList(entry.querySelector('.wordFreq'), datum.wordFreq.slice(0, 5), "object", "Word Freq");
+						result.generateList(entry.querySelector('.wordFreq'), datum.wordFreq, "object", "Word Freq");
+						// result.generateList(entry.querySelector('.wordFreq'), datum.wordFreq.slice(0, 5), "object", "Word Freq");
 
 						entry.querySelector('.pageSize').innerHTML = `<span class='dataTitle-inline'>Size: </span> ${datum.pageSize}B`; "Size: "+datum.pageSize+"B";
 						entry.querySelector('.score').innerHTML = `<span class='dataTitle-inline'>Score: </span> ${datum.score}`;
