@@ -40,10 +40,10 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
         ];
         Promise.all(promiseArray)
         .then((matchedPosts) => {
-
+          
           console.log("matched posts");
           console.log(matchedPosts);
-
+          
           var docsLookup = [{}, {}];   // {docID: { wordID: weight} }
 
 
@@ -52,40 +52,40 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
           var getWeight = (posts, title) => {
             //var idf = {}; // {wordID: idf}
             //var mtf = {}; // {wordID: mtf}
-
+            
             console.log("posts ");
             console.log(posts);
-
-
+        
+            
             var allDocs = new Set();
             posts.forEach((word) => {
               word.docs.forEach((posting) => {
                 allDocs.add(posting.docID);
               });
             });
-
+            
             console.log("all Docs");
             console.log(allDocs);
-
+            
             var allDocList = [];
             allDocs.forEach((docID) => { allDocList.push(docID); });
             console.log("all doc list");
             console.log(allDocList);
-
+            
             return model.indexTable.forward.getDocsList(allDocList);
           };
-
-          var kkk2 = [getWeight(matchedPosts[0],true),
+          
+          var kkk2 = [getWeight(matchedPosts[0],true), 
           getWeight(matchedPosts[1],false)
         ];
-
+          
           Promise.all(kkk2)
           .then((kkk) => {
-
+            
             console.log("ok");
-
+            
             console.log(kkk);
-
+            
             var totalWordList1 = [], totalWordList2 = [];
             kkk[0].forEach((doc) => {
               doc.words.forEach((word) => {
@@ -101,19 +101,19 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
            // console.log(totalWordList1);
            // console.log(totalWordList2);
             console.log("end list");
-
+            
             var promiseArray = [model.indexTable.inverted.getWordPostings(totalWordList1, true),   // [{  wordID: X, docs: [{ docID: X, freq: X}  ...]   }, ...]
               model.indexTable.inverted.getWordPostings(totalWordList2, false)
             ];
-
+            
             Promise.all(promiseArray)
             .then((totalWordPostings) => {
-
+              
               console.log("totalWordPostings ... ");
-
+              
               var idf = [{}, {}];
               var mtf = [{}, {}];
-
+              
               var computeParameters = (posts, title) => {
                 // Compute idf mtf
                 posts.forEach((word) => {
@@ -124,19 +124,19 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                   });
                 });
               };
-
+              
               computeParameters(totalWordPostings[0],true);
               computeParameters(totalWordPostings[1],false);
               console.log('idf');
               //console.log(mtf);
-
+            
               kkk[0].forEach((doc) => {
                 docsLookup[0][doc.docID]={};
                 doc.words.forEach((word) => {
                   if(idf[0][word.wordID]===undefined) console.error(word.wordID);
                   //docsLookup[0][doc.docID][word.wordID] = word.freq;
-                  if(word.wordID!=null) docsLookup[0][doc.docID][word.wordID]=word.freq*idf[0][word.wordID]/mtf[0][word.wordID]; /////////////////
-                  else docsLookup[0][doc.docID][word.wordID]=0;
++                  if(word.wordID!=null) docsLookup[0][doc.docID][word.wordID]=word.freq*idf[0][word.wordID]/mtf[0][word.wordID]; /////////////////
++                  else docsLookup[0][doc.docID][word.wordID]=0;
                 });
               });
 
@@ -146,8 +146,8 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 doc.words.forEach((word) => {
                   if(idf[1][word.wordID]===undefined) console.error(word.wordID);
                   //docsLookup[1][doc.docID][word.wordID] = word.freq;
-                  if(word.wordID!=null) docsLookup[1][doc.docID][word.wordID]=word.freq*idf[1][word.wordID]/mtf[1][word.wordID]; /////////////////
-                  else docsLookup[1][doc.docID][word.wordID]=0;
++                  if(word.wordID!=null) docsLookup[1][doc.docID][word.wordID]=word.freq*idf[1][word.wordID]/mtf[1][word.wordID]; /////////////////
++                  else docsLookup[1][doc.docID][word.wordID]=0;
                 });
               });
 
@@ -171,9 +171,6 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                     if(wordID!=null&&docs[docID][wordID]!=null)
                       docNorm[docID]+=Math.pow(docs[docID][wordID],2);
                   });
-                  if(docNorm[docID]==null) console.log("ssssssssssssssssssssssssssssssssssssssssssssssssssssss");
-                  
-                  
                 });
                 //console.log(docNorm);
 
@@ -195,9 +192,9 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
               return new Promise((resolve, reject) => {
                 resolve({title: getSimilarity(docsLookup[0]), body: getSimilarity(docsLookup[1])});
               });
-
+            
             })
-
+            
           .then((titleBodySimilarity) => {
 
             // Compute Rank for title and body
@@ -225,6 +222,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
             });
 
             return new Promise((resolve, reject) => {
+              //queryStat.totalQueryResults = mergedRankDocIDs.length;
               resolve(mergedRankDocIDs);   // slice to top X documents, where X=limit
             });
           }) // end:: found matching posts
@@ -232,43 +230,13 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
             var finalSimilarity={};
             mergedRankDocIDs.forEach((doc) => { finalSimilarity[doc.docID]=doc.similarity; });
-            mergedRankDocIDs = mergedRankDocIDs.map((doc) => { return doc.docID; });
+            mergedRankDocIDs = mergedRankDocIDs.map((doc) => { return doc.docID; }); //.slice(0,limit);
 
 
 
             console.log(`[SEARCHING] MATCH DOC TITLE:ID\t${mergedRankDocIDs}`.yellow);
 
             model.indexTable.forward.getDocsList(mergedRankDocIDs)  // [{docID: X, words: [{ wordID: X, freq: X, wordPos: X}, ...] }, ...]
-            .then((wordsData) => {
-              return new Promise((resolve, reject) => {
-                var idList = [];
-                wordsData.forEach((posting) => {
-                  posting.words.forEach((wordObj) => {
-                    idList.push(wordObj.wordID)
-                  })
-                });
-                model.indexTable.word.getIDWord(idList)
-                .then((wordObj) => {
-                  var idToWord = {};
-                  wordObj.forEach((w) => {
-                    idToWord[w._id] = w.word;
-                  });
-                  wordsData = wordsData.map((posting) => {
-                    return {
-                      docID: posting.docID,
-                      words: posting.words.map((wordObj) => {
-                        return {
-                          wordID: wordObj.wordID,
-                          freq: wordObj.freq,
-                          word: idToWord[wordObj.wordID]
-                        }
-                      })
-                    }
-                  })
-                  resolve(wordsData);
-                })
-              })
-            })
             .then((wordsData) => {
 
               // Call it [2nd piece] that will be used in final process
@@ -355,7 +323,6 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
               //console.log("check2");
               //console.log(tempRankDocIDs);
-              
               queryStat.totalQueryResults = tempRankDocIDs.length;
               mergedRankDocIDs = tempRankDocIDs.slice(0,limit);
               //console.log("newwwwwwwwwwwwwww");
@@ -428,9 +395,9 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 })
               })
             })
-
+            
           })
-
+          
         })
       })
     }) // end:: root promise
