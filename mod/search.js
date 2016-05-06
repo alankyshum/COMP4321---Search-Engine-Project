@@ -40,10 +40,10 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
         ];
         Promise.all(promiseArray)
         .then((matchedPosts) => {
-          
+
           console.log("matched posts");
           console.log(matchedPosts);
-          
+
           var docsLookup = [{}, {}];   // {docID: { wordID: weight} }
 
 
@@ -52,40 +52,40 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
           var getWeight = (posts, title) => {
             //var idf = {}; // {wordID: idf}
             //var mtf = {}; // {wordID: mtf}
-            
+
             console.log("posts ");
             console.log(posts);
-        
-            
+
+
             var allDocs = new Set();
             posts.forEach((word) => {
               word.docs.forEach((posting) => {
                 allDocs.add(posting.docID);
               });
             });
-            
+
             console.log("all Docs");
             console.log(allDocs);
-            
+
             var allDocList = [];
             allDocs.forEach((docID) => { allDocList.push(docID); });
             console.log("all doc list");
             console.log(allDocList);
-            
+
             return model.indexTable.forward.getDocsList(allDocList);
           };
-          
-          var kkk2 = [getWeight(matchedPosts[0],true), 
+
+          var kkk2 = [getWeight(matchedPosts[0],true),
           getWeight(matchedPosts[1],false)
         ];
-          
+
           Promise.all(kkk2)
           .then((kkk) => {
-            
+
             console.log("ok");
-            
+
             console.log(kkk);
-            
+
             var totalWordList1 = [], totalWordList2 = [];
             kkk[0].forEach((doc) => {
               doc.words.forEach((word) => {
@@ -101,19 +101,19 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
            // console.log(totalWordList1);
            // console.log(totalWordList2);
             console.log("end list");
-            
+
             var promiseArray = [model.indexTable.inverted.getWordPostings(totalWordList1, true),   // [{  wordID: X, docs: [{ docID: X, freq: X}  ...]   }, ...]
               model.indexTable.inverted.getWordPostings(totalWordList2, false)
             ];
-            
+
             Promise.all(promiseArray)
             .then((totalWordPostings) => {
-              
+
               console.log("totalWordPostings ... ");
-              
+
               var idf = [{}, {}];
               var mtf = [{}, {}];
-              
+
               var computeParameters = (posts, title) => {
                 // Compute idf mtf
                 posts.forEach((word) => {
@@ -124,12 +124,12 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                   });
                 });
               };
-              
+
               computeParameters(totalWordPostings[0],true);
               computeParameters(totalWordPostings[1],false);
               console.log('idf');
               //console.log(mtf);
-            
+
               kkk[0].forEach((doc) => {
                 docsLookup[0][doc.docID]={};
                 doc.words.forEach((word) => {
@@ -182,7 +182,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                   });
                   //if(docNorm[docID]<=0) console.log("ssssssssssssssssssssssssssssssssssssssssssssssss");
                   similarity[docID] = dotProduct/Math.pow(docNorm[docID],0.5)/Math.pow(queryNorm,0.5); // Cosine similarity measure
-                 // if(similarity[docID]==null) similarity[docID] = dotProduct/Math.pow(1,0.5)/Math.pow(queryNorm,0.5); // Cosine similarity measure 
+                 // if(similarity[docID]==null) similarity[docID] = dotProduct/Math.pow(1,0.5)/Math.pow(queryNorm,0.5); // Cosine similarity measure
                 });
 
                 console.log("similarity");
@@ -194,9 +194,9 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
               return new Promise((resolve, reject) => {
                 resolve({title: getSimilarity(docsLookup[0]), body: getSimilarity(docsLookup[1])});
               });
-            
+
             })
-            
+
           .then((titleBodySimilarity) => {
 
             // Compute Rank for title and body
@@ -210,11 +210,18 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
             new Set(Object.keys(rankDocIDs.title).concat(Object.keys(rankDocIDs.body))).forEach((docID) => {
               mergedRankDocIDs.push({
                 docID: docID,
-                similarity: (rankDocIDs.title[docID]===undefined?0:rankDocIDs.title[docID])*config.titleWeight+
-                            (rankDocIDs.body[docID]===undefined?0:rankDocIDs.body[docID])*(1-config.titleWeight)
+                similarity: (
+                  (isNaN(rankDocIDs.title[docID])?0:rankDocIDs.title[docID])*config.titleWeight
+                  + (isNaN(rankDocIDs.body[docID])?0:rankDocIDs.body[docID])*(1-config.titleWeight)
+                )
+                // IVAN: FIXME:: PLEASE CHECK THE FORMULA ABOVE
+                // similarity: (rankDocIDs.title[docID]===undefined?0:rankDocIDs.title[docID])*config.titleWeight+ (rankDocIDs.body[docID]===undefined?0:rankDocIDs.body[docID])*(1-config.titleWeight)
               });
               //console.log((rankDocIDs.title[docID]===undefined?0:rankDocIDs.title[docID])*config.titleWeight+
                             //(rankDocIDs.body[docID]===undefined?0:rankDocIDs.body[docID])*(1-config.titleWeight));
+              // console.error(`\n\n\n`);
+              // console.error(`rankDocIDs.title[${docID}]="${rankDocIDs.title[docID]}"`);
+              // console.error(`rankDocIDs.body[${docID}]="${rankDocIDs.body[docID]}"`);
             });
 
 
@@ -333,7 +340,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
 
               // ALL FINISH ALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
-              
+
               model.indexTable.page.getPages(mergedRankDocIDs)
                 .then((pagesData) => {
 
@@ -399,9 +406,9 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 })
               })
             })
-            
+
           })
-          
+
         })
       })
     }) // end:: root promise
