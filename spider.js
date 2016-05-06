@@ -26,13 +26,19 @@ var writeCnt = cnt(1);
 var bulkOps = (cacheIndex) => {
 	// cacheIndex: local::cacheIndex, avoid being updated during
 	// other async page crawling process
+
+	var wordCache = [];
+	objectCache.pageCache[cacheIndex].forEach((page) => {
+		wordCache = wordCache.concat(Object.keys(page.wordFreq)); // output words
+	});
+
 	return Promise.all([
 		// return pageIDList, wordIDList
 		model.indexTable.page.upsertBulk(objectCache.pageCache[cacheIndex])
 		.then(() => {
 			return model.indexTable.page.getURLID(objectCache.pageCache[cacheIndex].map((page) => {return page.url}))
 		}),
-		model.indexTable.word.upsert(objectCache.wordCache[cacheIndex])
+		model.indexTable.word.upsert(wordCache)
 		.then((wordList) => {
 			return model.indexTable.word.getWordID(wordList)
 		})
@@ -63,7 +69,6 @@ var bulkOps = (cacheIndex) => {
 				});
       });
 
-      
 		}); // end:: loop page --> prepare wordFreqTable
 
 		// WRITE TO DATABASE
@@ -79,7 +84,6 @@ var bulkOps = (cacheIndex) => {
 		// CLEAR CACHE
 		console.log(`CLEAR CACHE [${cacheIndex}] ...`.red);
 		objectCache.pageCache[cacheIndex] = [];
-		objectCache.wordCache[cacheIndex] = [];
 		return new Promise((resolve) => {resolve(cacheIndex)})
 	})
 }
@@ -94,10 +98,7 @@ crawl.recursiveExtractLink(config.rootURL, (page) => {
 	console.info(`[${objectCache.cacheIndex}/${_wCnt}] ${page.title}`);
 	if (!objectCache.pageCache[objectCache.cacheIndex])
 		objectCache.pageCache[objectCache.cacheIndex] = [];
-	if (!objectCache.wordCache[objectCache.cacheIndex])
-		objectCache.wordCache[objectCache.cacheIndex] = [];
 	objectCache.pageCache[objectCache.cacheIndex].push(page);
-	objectCache.wordCache[objectCache.cacheIndex] = objectCache.wordCache[objectCache.cacheIndex].concat(Object.keys(page.wordFreqTitle).concat(Object.keys(page.wordFreqBody)));
 	if (objectCache.pageCache[objectCache.cacheIndex].length === config.bulkWindow) {
 		bulkOps(objectCache.cacheIndex);
 	}
