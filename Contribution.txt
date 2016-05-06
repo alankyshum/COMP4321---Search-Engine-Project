@@ -1,0 +1,2 @@
+20115291, Ivan, 50%, similarity search engine part
+20110916, Alan, 50%, frontend part

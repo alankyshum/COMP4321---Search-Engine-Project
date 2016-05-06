@@ -135,8 +135,8 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 doc.words.forEach((word) => {
                   if(idf[0][word.wordID]===undefined) console.error(word.wordID);
                   //docsLookup[0][doc.docID][word.wordID] = word.freq;
-+                  if(word.wordID!=null) docsLookup[0][doc.docID][word.wordID]=word.freq*idf[0][word.wordID]/mtf[0][word.wordID]; /////////////////
-+                  else docsLookup[0][doc.docID][word.wordID]=0;
+         if(word.wordID!=null) docsLookup[0][doc.docID][word.wordID]=word.freq*idf[0][word.wordID]/mtf[0][word.wordID]; /////////////////
+                  else docsLookup[0][doc.docID][word.wordID]=0;
                 });
               });
 
@@ -146,8 +146,8 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 doc.words.forEach((word) => {
                   if(idf[1][word.wordID]===undefined) console.error(word.wordID);
                   //docsLookup[1][doc.docID][word.wordID] = word.freq;
-+                  if(word.wordID!=null) docsLookup[1][doc.docID][word.wordID]=word.freq*idf[1][word.wordID]/mtf[1][word.wordID]; /////////////////
-+                  else docsLookup[1][doc.docID][word.wordID]=0;
+               if(word.wordID!=null) docsLookup[1][doc.docID][word.wordID]=word.freq*idf[1][word.wordID]/mtf[1][word.wordID]; /////////////////
+                  else docsLookup[1][doc.docID][word.wordID]=0;
                 });
               });
 
@@ -180,7 +180,9 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                   ids.forEach((wordID) => {
                     dotProduct+=(docs[docID][wordID]===undefined?0:docs[docID][wordID]*wordFreq[wordIDToWordLookup[wordID]]);
                   });
+                  //if(docNorm[docID]<=0) console.log("ssssssssssssssssssssssssssssssssssssssssssssssss");
                   similarity[docID] = dotProduct/Math.pow(docNorm[docID],0.5)/Math.pow(queryNorm,0.5); // Cosine similarity measure
+                 // if(similarity[docID]==null) similarity[docID] = dotProduct/Math.pow(1,0.5)/Math.pow(queryNorm,0.5); // Cosine similarity measure 
                 });
 
                 console.log("similarity");
@@ -330,6 +332,8 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
             //  console.log(finalSimilarity);
 
 
+              // ALL FINISH ALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL
+              
               model.indexTable.page.getPages(mergedRankDocIDs)
                 .then((pagesData) => {
 
