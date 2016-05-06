@@ -134,8 +134,9 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 docsLookup[0][doc.docID]={};
                 doc.words.forEach((word) => {
                   if(idf[0][word.wordID]===undefined) console.error(word.wordID);
-                  docsLookup[0][doc.docID][word.wordID] = word.freq;
-                  if(word.wordID!=null) docsLookup[0][doc.docID][word.wordID]*=idf[0][word.wordID]/mtf[0][word.wordID]; /////////////////
+                  //docsLookup[0][doc.docID][word.wordID] = word.freq;
+                  if(word.wordID!=null) docsLookup[0][doc.docID][word.wordID]=word.freq*idf[0][word.wordID]/mtf[0][word.wordID]; /////////////////
+                  else docsLookup[0][doc.docID][word.wordID]=0;
                 });
               });
 
@@ -144,8 +145,9 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 docsLookup[1][doc.docID]={};
                 doc.words.forEach((word) => {
                   if(idf[1][word.wordID]===undefined) console.error(word.wordID);
-                  docsLookup[1][doc.docID][word.wordID] = word.freq;
-                  if(word.wordID!=null) docsLookup[1][doc.docID][word.wordID]*=idf[1][word.wordID]/mtf[1][word.wordID]; /////////////////
+                  //docsLookup[1][doc.docID][word.wordID] = word.freq;
+                  if(word.wordID!=null) docsLookup[1][doc.docID][word.wordID]=word.freq*idf[1][word.wordID]/mtf[1][word.wordID]; /////////////////
+                  else docsLookup[1][doc.docID][word.wordID]=0;
                 });
               });
 
@@ -166,8 +168,12 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 Object.keys(docs).forEach((docID) => {
                   docNorm[docID]=0;
                   Object.keys(docs[docID]).forEach((wordID) => {
-                    docNorm[docID]+=Math.pow(docs[docID][wordID],2);
+                    if(wordID!=null&&docs[docID][wordID]!=null)
+                      docNorm[docID]+=Math.pow(docs[docID][wordID],2);
                   });
+                  if(docNorm[docID]==null) console.log("ssssssssssssssssssssssssssssssssssssssssssssssssssssss");
+                  
+                  
                 });
                 //console.log(docNorm);
 
@@ -219,7 +225,6 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
             });
 
             return new Promise((resolve, reject) => {
-              queryStat.totalQueryResults = mergedRankDocIDs.length;
               resolve(mergedRankDocIDs);   // slice to top X documents, where X=limit
             });
           }) // end:: found matching posts
@@ -227,7 +232,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
             var finalSimilarity={};
             mergedRankDocIDs.forEach((doc) => { finalSimilarity[doc.docID]=doc.similarity; });
-            mergedRankDocIDs = mergedRankDocIDs.map((doc) => { return doc.docID; }).slice(0,limit);
+            mergedRankDocIDs = mergedRankDocIDs.map((doc) => { return doc.docID; });
 
 
 
@@ -350,7 +355,8 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
               //console.log("check2");
               //console.log(tempRankDocIDs);
-
+              
+              queryStat.totalQueryResults = tempRankDocIDs.length;
               mergedRankDocIDs = tempRankDocIDs.slice(0,limit);
               //console.log("newwwwwwwwwwwwwww");
               //console.log(mergedRankDocIDs);
