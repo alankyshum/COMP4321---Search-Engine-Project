@@ -3,7 +3,7 @@
   "mongoDB": "mongodb://localhost:27017/comp4321",
   "resultFile": "spider_result.txt",
   "maxPages": 300,
-  "crawlTimeOut": 2500,
+  "crawlTimeOut": 10000,
   "bulkWindow": 100,
   "maxRankPages": 50,
   "titleWeight": 0.75,

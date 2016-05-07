@@ -41,7 +41,7 @@ module.exports.extractLinks = (link) => {
         var body = $("body").html($("body").html().replace(/<br\s*[\/]?>/gi, "\n")).text();
        // console.log(body);
         var title = $("title").html($("title").html().replace(/<br\s*[\/]?>/gi, "\n")).text();
-        var bodyTitle = body.concat(title);
+        var bodyTitle = body.concat(" ", title);
         
         
 				$('a[href]').each((a_i, a) => {
