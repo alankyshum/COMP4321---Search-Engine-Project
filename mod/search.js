@@ -85,7 +85,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 totalWordList2.push(word.wordID);
               });
             });
-            
+
            //console.log(totalWordList1);
            //console.log(totalWordList2);
            // console.log("end list");
@@ -116,7 +116,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                   });
                 });
               };
-              
+
 
               computeParameters(totalWordPostings[0],true);
               computeParameters(totalWordPostings[1],false);
@@ -134,7 +134,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 //console.log(doc.docID);
                 docsLookup[1][doc.docID]={};
                 doc.words.forEach((word) => {
-                  if(idf[1][word.wordID]!==undefined&&separateFreq[1][word.wordID][doc.docID]!==undefined) 
+                  if(idf[1][word.wordID]!==undefined&&separateFreq[1][word.wordID][doc.docID]!==undefined)
                     docsLookup[1][doc.docID][word.wordID]=separateFreq[1][word.wordID][doc.docID]*idf[1][word.wordID]/mtf[1][word.wordID]; /////////////////
                 });
               });
@@ -182,17 +182,17 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
               return new Promise((resolve, reject) => {
                 resolve({title: getSimilarity(docsLookup[0]), body: getSimilarity(docsLookup[1])});
               });
-              
+
             })
 
           .then((titleBodySimilarity) => {
-              
+
 
             // Compute Rank for title and body
             var rankDocIDs = {};
             rankDocIDs.title = titleBodySimilarity.title;
             rankDocIDs.body = titleBodySimilarity.body;
-              
+
            // console.log(rankDocIDs);
 
 
@@ -245,7 +245,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                   phraseLookup[posting.docID][word.wordID]=word.wordPos;
                 });
               });
-              
+
               console.log("phrase handling");
 
               // Phrase handling
@@ -262,7 +262,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
                 var finalCheck = 1;
                 Object.keys(wordPhrase).forEach((phrase) => {
-                  
+
                   var posListArray = [];
                   wordPhrase[phrase].forEach((wordID) => {
                     if(phraseLookup[docID][wordID]!==undefined)
@@ -326,7 +326,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 .then((pagesData) => {
 
                 console.log("handle parent links");
-                
+
                 // This links list is for plugging in getPagesWithChilds, which requires links but not ids
                 var docLinksList = [];
                 pagesData.forEach((page) => { docLinksList.push(page.url); });
