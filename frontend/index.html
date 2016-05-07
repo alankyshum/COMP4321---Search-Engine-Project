@@ -30,13 +30,14 @@
 					<div class="pageTitle"></div>
 				</a>
 				<div class="pageInfo">
-					<div class="lastModifiedDate"></div>
 					<div class="url"></div>
+					<div class="lastModifiedDate"></div>
 					<div class="childLinks"></div>
 					<div class="parentLinks"></div>
 					<div class="wordFreq"></div>
-					<div class="pageSize"></div>
+					<span class='dataTitle'> </span>
 					<div class="score"></div>
+					<div class="pageSize"></div>
 				</div>
 			</div>
 		</template>
@@ -66,6 +67,7 @@
 				cache: null, // cor caching results from server
 				summary: {}
 			}
+			result.idToHashMap = {};
 
 			// -------------------
 			// HELPER FUNCTIONS
@@ -120,18 +122,19 @@
 			result.generateList = (targetDiv, data, type, title) => {
 				var li;
 				var ol = document.createElement('ol');
-				if (type == "object") {
+				if (type == "words") {
 					data.forEach((datum) => {
 						li = document.createElement('li');
-						Object.keys(datum).forEach((key) => {
-							li.textContent += `[${key}] ${datum[key]}; `;
-						});
+						li.innerHTML += `
+							<strong>"${result.idToHashMap[datum.wordID]}"x ${datum.freq}: </strong> <code>[ID]${datum.wordID}</code><br/>
+							<strong>Pos: </strong> <code>[${datum.wordPos}]</code>
+						`;
 						ol.appendChild(li);
 					});
-				} else if (type == "array") {
+				} else if (type == "links") {
 					data.forEach((datum) => {
 						li = document.createElement('li');
-						li.textContent = datum;
+						li.innerHTML = `<a href=${datum}' target='_blank'>${datum}</a>`;
 						ol.appendChild(li);
 					})
 				}
@@ -178,16 +181,15 @@
 							entry.querySelector('.favIcon').textContent = datum.title.substr(0, 1);
 						}
 						entry.querySelector('.pageTitle').textContent = datum.title;
-						entry.querySelector('.lastModifiedDate').textContent = (new Date(datum.lastModifiedDate)).toDateString();
+						entry.querySelector('.lastModifiedDate').innerHTML = `<strong>Last Modified Date</strong>: ${(new Date(datum.lastModifiedDate)).toDateString()}`;
 						entry.querySelector('.url').textContent = datum.url;
 
-						result.generateList(entry.querySelector('.childLinks'), datum.childLinks, "array", "Child Links");
-						result.generateList(entry.querySelector('.parentLinks'), datum.parentLinks, "array", "Parent Links");
-						result.generateList(entry.querySelector('.wordFreq'), datum.wordFreq, "object", "Word Freq");
-						// result.generateList(entry.querySelector('.wordFreq'), datum.wordFreq.slice(0, 5), "object", "Word Freq");
+						result.generateList(entry.querySelector('.childLinks'), datum.childLinks, "links", "Child Links");
+						result.generateList(entry.querySelector('.parentLinks'), datum.parentLinks, "links", "Parent Links");
+						result.generateList(entry.querySelector('.wordFreq'), datum.wordFreq, "words", "Word Freq");
 
-						entry.querySelector('.pageSize').innerHTML = `<span class='dataTitle-inline'>Size: </span> ${datum.pageSize}B`; "Size: "+datum.pageSize+"B";
-						entry.querySelector('.score').innerHTML = `<span class='dataTitle-inline'>Score: </span> ${datum.score}`;
+						entry.querySelector('.pageSize').innerHTML = `<strong>Size: </strong><code>${datum.pageSize}B</code>`;
+						entry.querySelector('.score').innerHTML = `<strong>Score: </strong><code>${datum.score}</code>`;
 
 						entry.querySelector('a.header').setAttribute('href', datum.url);
 						entry.querySelector('a.header').setAttribute('target', '_blank');
@@ -237,6 +239,7 @@
 						query.submit()
 						.then((response) => {
 							result.cache = response;
+							result.idToHashMap = response.idToWordHash;
 							result.buildDOM(response);
 							query.DOM.classList.remove('shrinkToLoadingBar');
 							query.formDOM.classList.add('fadedOut');

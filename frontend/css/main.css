@@ -154,11 +154,11 @@ body {
         overflow: auto; }
         #results .resultItem .pageInfo ol li {
           font-family: monospace;
-          background-color: #ddd;
+          background-color: #f9f9f9;
           padding: 2px 5px;
           margin-top: 5px;
           border-radius: 2px; }
-      #results .resultItem .pageInfo .dataTitle-inline,
+      #results .resultItem .pageInfo strong,
       #results .resultItem .pageInfo .dataTitle {
         font-weight: 500;
         font-size: 14px; }
@@ -168,6 +168,14 @@ body {
         padding-bottom: 2px;
         margin-top: 20px;
         display: block; }
+      #results .resultItem .pageInfo strong {
+        min-width: 90px;
+        display: inline-block; }
+      #results .resultItem .pageInfo a {
+        color: #24A3D5;
+        text-decoration: none; }
+        #results .resultItem .pageInfo a:hover {
+          text-decoration: underline; }
       #results .resultItem .pageInfo div {
         word-wrap: break-word;
         margin-bottom: 10px; }
