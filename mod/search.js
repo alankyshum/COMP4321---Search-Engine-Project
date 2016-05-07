@@ -27,6 +27,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
       var ids = wordsData.map((item) => { return item._id; });
       // Lookup wordID to word
       var wordIDToWordLookup = {};
+      var wordIDSet = new Set();
       wordsData.forEach((word) => { wordIDToWordLookup[word._id] = word.word; });
       // Lookup word to wordID
       var wordToWordIDLookup = {};
@@ -85,7 +86,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 totalWordList2.push(word.wordID);
               });
             });
-            
+
            // console.log(totalWordList1);
            // console.log(totalWordList2);
             console.log("end list");
@@ -173,17 +174,17 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
               return new Promise((resolve, reject) => {
                 resolve({title: getSimilarity(docsLookup[0]), body: getSimilarity(docsLookup[1])});
               });
-              
+
             })
 
           .then((titleBodySimilarity) => {
-              
+
 
             // Compute Rank for title and body
             var rankDocIDs = {};
             rankDocIDs.title = titleBodySimilarity.title;
             rankDocIDs.body = titleBodySimilarity.body;
-              
+
             console.log(rankDocIDs);
 
 
@@ -227,16 +228,33 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
               // Call it [2nd piece] that will be used in final process
               var wordsLookup = {}; // {docID: [{ wordID: X, freq: X}, ...] }
-              wordsData.forEach((posting) => { wordsLookup[posting.docID]=posting.words; });
               // For phrase filter to use
               var phraseLookup = {}; // {docID: { wordID: [pos1, pos2, ...] } }
               wordsData.forEach((posting) => {
+                // [0] wordsLookup
+                wordsLookup[posting.docID]=posting.words;
+                // [1] phraseLookup
                 phraseLookup[posting.docID]={};
                 posting.words.forEach((word) => {
                   phraseLookup[posting.docID][word.wordID]=word.wordPos;
+                  // [2] wordIDSet, for getting words string
+                  wordIDSet.add(word.wordID);
                 });
               });
-              
+
+              // WORDID TO WORD HASHMAP TO CLIENT --
+              // WHY HERE: read word table takes long time
+              // start as soon as possible
+              // return the hashtable at last
+              var idToWordPromise = new Promise((resolve, reject) => {
+                model.indexTable.word.getIDWord(Array.from(wordIDSet)).then((wordIDList) => {
+                  wordIDList.forEach((w) => {
+                    wordIDToWordLookup[w._id] = w.word;
+                  })
+                  resolve();
+                })
+              });
+
               console.log("phrase handling");
 
               // Phrase handling
@@ -253,7 +271,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
 
                 var finalCheck = 1;
                 Object.keys(wordPhrase).forEach((phrase) => {
-                  
+
                   var posListArray = [];
                   wordPhrase[phrase].forEach((wordID) => {
                     if(phraseLookup[docID][wordID]!==undefined)
@@ -317,7 +335,7 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 .then((pagesData) => {
 
                 console.log("handle parent links");
-                
+
                 // This links list is for plugging in getPagesWithChilds, which requires links but not ids
                 var docLinksList = [];
                 pagesData.forEach((page) => { docLinksList.push(page.url); });
@@ -325,12 +343,15 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                 var linkToIDLookup = {};  // {link: ID}
                 pagesData.forEach((page) => { linkToIDLookup[page.url]=page._id; });
 
-                model.indexTable.page.getPagesWithChilds(docLinksList)    // [{url: X, childLinks: [childLinks1, childLinks2, ...] }, ...]
+                Promise.all([
+                  model.indexTable.page.getPagesWithChilds(docLinksList),
+                  // [{url: X, childLinks: [childLinks1, childLinks2, ...] }, ...]
+                  idToWordPromise // idToWord promising running in the background
+                ])
                 .then((parentPagesData) => {
-
                   // Process the parents, call it [1st piece] will be used in later process
                   var parentsLookup = {}; // {docID: [parenturl1, parenturl2, ...]}
-                  parentPagesData.forEach((page) => {
+                  parentPagesData[0].forEach((page) => {
                     page.childLinks.forEach((childLink) => {
                       if(linkToIDLookup[childLink]){
                         if(parentsLookup[linkToIDLookup[childLink]]===undefined)
@@ -374,7 +395,8 @@ module.exports.find = (wordFreq, wordPhrase, limit) => {   // wordFreq = {word: 
                     querySummary: {
                       time: (new Date() - queryStat.startTime)/1000,
                       resultsCnt: queryStat.totalQueryResults
-                    }
+                    },
+                    idToWordHash: wordIDToWordLookup
                   });
 
                 })

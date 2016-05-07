@@ -2,3 +2,4 @@ node_modules
 npm-debug.log
 db_files
 db
+.tern-project
