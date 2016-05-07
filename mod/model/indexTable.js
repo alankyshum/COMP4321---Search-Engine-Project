@@ -469,14 +469,13 @@ module.exports.inverted = (() => {
     });
   });
 
-  returnFx.getWordPostings = ((wordIDList, findTitle, limit) => {   // [listNum] true: Title, false: Body
+  returnFx.getWordPostings = ((wordIDList, findTitle) => {   // [listNum] true: Title, false: Body
     // default parameter (limit)
     return new Promise((resolve, reject) => {
       try {
         dbModel[findTitle?"invertedTableTitle":"invertedTableBody"]
         .find({ wordID: {$in: wordIDList} })
         .select('-_id wordID docs')
-        //.limit(limit?limit:10)   // I need this to produce correct result, unlimited
         .exec((err, postings) => {
           console.log(`DONE SEARCHING DOCUMENTS [${findTitle?"INVERTED_TABLE::TITLE":"INVERTED_TABLE::BODY"}]`);
           if (err) {console.error(err); return reject(err);}
