@@ -19,7 +19,7 @@
 		</div>
 		<div id="querySummary" class='hidden'>
 			<p>
-				Retrieved <span class="numResults"></span> results in <span class="queryTime"></span> seconds.
+				Retrieved <span class="numResults"></span> results for <strong class='searchKeyword'></strong> in <span class="queryTime"></span> seconds.
 			</p>
 		</div>
 
@@ -56,6 +56,7 @@
 				suggestedWordDOM: document.getElementById('suggestedWords'),
 				sound: document.getElementById('soundEffect'),
 				summaryDOM: document.getElementById('querySummary'),
+				searchItem: ""
 			};
 			var result = {
 				DOM: document.getElementById('results'),
@@ -65,9 +66,9 @@
 				limit: 10,
 				currentPage: 1,
 				cache: null, // cor caching results from server
-				summary: {}
+				summary: {},
+				idToHashMap: {}
 			}
-			result.idToHashMap = {};
 
 			// -------------------
 			// HELPER FUNCTIONS
@@ -213,6 +214,7 @@
 						query.summaryDOM.classList.remove('hidden');
 						query.summaryDOM.querySelector('.queryTime').textContent = res.querySummary.time;
 						query.summaryDOM.querySelector('.numResults').textContent = res.querySummary.resultsCnt;
+						query.summaryDOM.querySelector('.searchKeyword').textContent = query.searchItem;
 						result.summary = res.querySummary;
 					}
 
@@ -235,6 +237,7 @@
 						// animate input box
 						query.DOM.classList.add('shrinkToLoadingBar');
 						query.sound.play();
+						query.searchItem = query.DOM.value;
 						// submit form
 						query.submit()
 						.then((response) => {
@@ -245,16 +248,6 @@
 							query.formDOM.classList.add('fadedOut');
 							result.DOM.classList.remove('typing');
 						});
-						break;
-					// some function keys
-					case 38: // up
-					case 38: // left
-					case 40: // right
-					case 40: // down
-					case 17: // control
-					case 18: // option
-					case 91: // command left
-					case 93: // command right
 						break;
 					default: // other keys
 						if (query.DOM.value.length+1 <= 3) break; // +1 for the delay
