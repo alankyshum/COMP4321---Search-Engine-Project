@@ -15,10 +15,8 @@ const url = require('url');
 module.exports.extractLinks = (link) => {
 
 	return new Promise((resolve, reject) => {
-
 		var crawlTimeout = setTimeout(() => {
-			console.error(`[CRAWLER] Crawling ${link} timeout of [${config.crawlTimeout/1000}s] limit`);
-			reject("timeout");
+			reject(`[CRAWLER] Crawling ${link} timeout of [${config.crawlTimeOut/1000}s] limit`);
 		}, config.crawlTimeOut);
 
 		var decoder = new StringDecoder('utf8');
@@ -37,13 +35,13 @@ module.exports.extractLinks = (link) => {
 
       res.on('end', () => {
         var $ = cheerio.load(decoder.write(data));
-        
-        var body = $("body").html($("body").html().replace(/<br\s*[\/]?>/gi, "\n")).text();
+
+        var body = $("body").html()?$("body").html($("body").html().replace(/<br\s*[\/]?>/gi, "\n")).text():$("body").text();
        // console.log(body);
-        var title = $("title").html($("title").html().replace(/<br\s*[\/]?>/gi, "\n")).text();
+        var title = $("title").html()?$("title").html($("title").html().replace(/<br\s*[\/]?>/gi, "\n")).text():$("title").text();
         var bodyTitle = body.concat(" ", title);
-        
-        
+
+
 				$('a[href]').each((a_i, a) => {
 					linkSet.add(url.resolve(link, $(a).attr('href')));
 			 	});
@@ -98,7 +96,12 @@ module.exports.recursiveExtractLink = (link, middleCB, finalCB) => {
 
         // recursively call
         crawlChild();
-      });
+      })
+			.catch((msg) => {
+				console.error(`[CRAWLER]\t${msg}`);
+				crawledLinks[_queue[0]]=true; // for shifting queue forward
+				crawlChild();
+			})
     else if(numCrawled < config.maxPages)
       console.log(`[Error] Cannot retrieve enough pages - current: ${numCrawled}, target: ${config.maxPages}`);
     else finalCB(allPages);
