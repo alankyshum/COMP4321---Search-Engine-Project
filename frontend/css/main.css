@@ -268,3 +268,18 @@ body {
     font-weight: 600;
     color: white;
     pointer-events: none; }
+
+#mobileSearchBtn {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  background-image: url("../assets/search_button.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  opacity: .4;
+  display: none; }
+  #mobileSearchBtn.virtualKeyboard {
+    display: block !important; }

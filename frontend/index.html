@@ -3,6 +3,8 @@
 	<head>
 		<meta charset="utf-8">
 		<title>COMP4321 - Search Engine</title>
+		<meta name="theme-color" content="#24A3D5">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" href="css/main.css" media="screen" title="Main CSS" charset="utf-8">
 	</head>
 	<body>
@@ -22,6 +24,7 @@
 				Retrieved <span class="numResults"></span> results for <strong class='searchKeyword'></strong> in <span class="queryTime"></span> seconds.
 			</p>
 		</div>
+		<div id="mobileSearchBtn"></div>
 
 		<template id="resultTemplate">
 			<div class="resultItem">
@@ -56,6 +59,7 @@
 				suggestedWordDOM: document.getElementById('suggestedWords'),
 				sound: document.getElementById('soundEffect'),
 				summaryDOM: document.getElementById('querySummary'),
+				mobileBtn: document.getElementById('mobileSearchBtn'),
 				searchItem: ""
 			};
 			var result = {
@@ -200,7 +204,7 @@
 					if (!pageResultsOnly) {
 						// build pageination buttons
 						emptyChildren(result.paginationDOM);
-						var numPages = parseInt(res.querySummary.resultsCnt / result.limit) + 1;
+						var numPages = Math.ceil(res.querySummary.resultsCnt / result.limit);
 						var pageBtn;
 						for (var i = 1; i <= numPages; i++) {
 							pageBtn = document.importNode(result.pageinationTemplate, true);
@@ -238,6 +242,7 @@
 						query.DOM.classList.add('shrinkToLoadingBar');
 						query.sound.play();
 						query.searchItem = query.DOM.value;
+						query.DOM.disabled = true;
 						// submit form
 						query.submit()
 						.then((response) => {
@@ -245,6 +250,7 @@
 							result.idToHashMap = response.idToWordHash;
 							result.buildDOM(response);
 							query.DOM.classList.remove('shrinkToLoadingBar');
+							query.DOM.disabled = false;
 							query.formDOM.classList.add('fadedOut');
 							result.DOM.classList.remove('typing');
 						});
@@ -269,7 +275,25 @@
 						}, 1000);
 						break;
 				}
+			}// end:: keyup
+
+
+			// touch keyboard optimisation
+			// without physical keyboard, add button to show search bar
+			document.body.addEventListener('touchstart', function(e){
+				query.mobileBtn.classList.add('virtualKeyboard');
+    	}, false)
+			query.mobileBtn.onclick = () => {
+				if (query.formDOM.classList.contains('fadedOut')) {
+					query.DOM.focus();
+					result.DOM.classList.add('typing');
+					query.formDOM.classList.remove('fadedOut');
+				} else {
+					query.formDOM.classList.add('fadedOut');
+					result.DOM.classList.remove('typing');
+				}
 			}
+
 		</script>
 	</body>
 </html>
