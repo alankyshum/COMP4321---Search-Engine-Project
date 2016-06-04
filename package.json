@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/a100438a13/se.git"
+    "url": "https://github.com/alankyshum/COMP4321---Search-Engine-Project.git"
   },
   "keywords": [
     "HKUST",
@@ -19,10 +19,7 @@
   ],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://gitlab.com/alankyshum/COMP4321_2016/issues"
-  },
-  "homepage": "https://bitbucket.org/a100438a13/se",
+  "homepage": "https://github.com/alankyshum/COMP4321---Search-Engine-Project.git",
   "dependencies": {
     "cheerio": "^0.20.0",
     "express": "^4.13.4",

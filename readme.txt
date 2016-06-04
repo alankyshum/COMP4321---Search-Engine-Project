@@ -8,11 +8,11 @@
 Contribution Percentage:
 Each of us contributes 50% to the whole project.
 
-Alan Shum: Implement Crawler, Implement Output file, Design Schemas, Implement word/page indexes and operations
-Ivan Fung: Fix Crawler, Implement BFS, Implement Forward/Inverted indexes and operations, Documentation
+Alan: Implement Crawler, Implement Output file, Design Schemas, Implement word/page indexes and operations
+Ivan: Fix Crawler, Implement BFS, Implement Forward/Inverted indexes and operations, Documentation
 
 
-Note: 
+Note:
 Please find the Database schema in /mod/model.js
 We choose mongodb because this situation is to store pages, which are document-like.
 The schema is simple enough to understand.
